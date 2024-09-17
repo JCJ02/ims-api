@@ -27,8 +27,8 @@ async function loginAdminUser() {
 
     try {
 
-        const email = "testing@gmail.com";
-        const password = "@lunas123";
+        const email = "jacobe.johncarlo.02022003@gmail.com";
+        const password = "@jacobe123";
 
         const validateAdminUser = await prisma.admin.findUnique({
             where: { 

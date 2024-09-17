@@ -22,7 +22,7 @@ const userSchema = z.object({
     confirmPassword: z.string().optional().nullable()
 }).refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"], 
-    message: "Passwrod And Confirm Password Are Not Match!",
+    message: "Password And Confirm Password Are Not Match!",
 });;
 
 export default userSchema;
