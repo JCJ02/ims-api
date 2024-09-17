@@ -14,7 +14,7 @@ class AdminController {
         this.adminService = new AdminService();
 
         this.index = this.index.bind(this);
-        this.create = this.create.bind(this);
+        this.createAdmin = this.createAdmin.bind(this);
         this.loginAdmin = this.loginAdmin.bind(this);
 
     }
@@ -22,23 +22,34 @@ class AdminController {
     // TEST
     async index(req: Request, res: Response) {
 
-        const message = await this.testService.index();
+        try {
 
-        return AppResponse.sendSuccessfull({
-            res,
-            data: message,
-            message: "Successfull!",
-            code: 200
-        });
+            const message = await this.testService.index();
+
+            return AppResponse.sendSuccessfull({
+                res,
+                data: message,
+                message: "Successfull!",
+                code: 200
+            });
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
 
     }
 
     // CREATE ADMIN
-    async create(req: Request, res: Response) {
+    async createAdmin(req: Request, res: Response) {
 
         try {
 
-            await this.adminService.create(req.body, req, res);
+            await this.adminService.createAdmin(req.body, req, res);
     
         } catch (error: any) {
             return AppResponse.sendErrors({
@@ -53,6 +64,7 @@ class AdminController {
 
     // LOGIN ADMIN
     async loginAdmin(req: Request, res: Response) {
+
         try {
 
             await this.adminService.loginAdmin(req.body, req, res);
@@ -65,6 +77,7 @@ class AdminController {
                 code: 500
             });
         }
+        
     }
 }
 

@@ -1,16 +1,16 @@
 import bcrypt from "bcryptjs";
 import prisma from "../utils/client";
-import userSchema from "../utils/validations/admin.schema";
+import adminSchema from "../utils/validations/AdminSchema";
 import { Request, Response } from "express";
 import AppResponse from "../utils/AppResponse";
 import generateToken from "../utils/token";
 
 class AdminRepo {
 
-    async create(data: any, req: Request, res: Response) {
+    async createAdmin(data: any, req: Request, res: Response) {
         try {
 
-            const validation = userSchema.safeParse(req.body);
+            const validation = adminSchema.safeParse(req.body);
 
             if(validation.error) {
                 AppResponse.sendErrors({
@@ -23,7 +23,7 @@ class AdminRepo {
 
             const hashPassword = bcrypt.hashSync(data.password, 10);
             
-            const newAdminUser = await prisma.admin.create({
+            const newAdmin = await prisma.admin.create({
                 data: {
                     firstname: data.firstname,
                     lastname: data.lastname,
@@ -35,7 +35,7 @@ class AdminRepo {
             return AppResponse.sendSuccessfull({
                 res,
                 data: {
-                    user: newAdminUser
+                    user: newAdmin
                 },
                 message: "Successfully Registered!",
                 code: 201
@@ -104,15 +104,15 @@ class AdminRepo {
 
     }
 
-    // async get() {
+    // async getAllAdmin() {
     //     return "GET!";
     // }
 
-    // async delete() {
+    // async deleteAdmin() {
     //     return "DELETE!";
     // }
 
-    // async update() {
+    // async updateAdmin() {
     //     return "UPDATE!";
     // }
 }

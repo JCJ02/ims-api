@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const userSchema = z.object({
+const adminSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
         invalid_type_error: "Firstname Must Be A Strin!"
@@ -25,4 +25,4 @@ const userSchema = z.object({
     message: "Password And Confirm Password Are Not Match!",
 });;
 
-export default userSchema;
+export default adminSchema;

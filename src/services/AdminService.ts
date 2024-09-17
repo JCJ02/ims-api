@@ -9,8 +9,8 @@ class AdminService {
         this.adminRepo = new AdminRepo();
     }
 
-    async create(data: any, req: Request, res: Response){
-        return this.adminRepo.create(data, req, res);
+    async createAdmin(data: any, req: Request, res: Response){
+        return this.adminRepo.createAdmin(data, req, res);
     }
 
     async loginAdmin(data: any, req: Request, res: Response){

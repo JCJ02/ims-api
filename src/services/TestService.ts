@@ -1,5 +1,4 @@
 import TestRepo from "../repo/TestRepo";
-import AdminRepo from "../repo/AdminRepo";
 
 class TestService {
 

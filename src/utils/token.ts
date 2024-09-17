@@ -6,8 +6,8 @@ dotenv.config();
 const generateToken = (payload: any) => {
 
     if (!process.env.JWT_SECRET_KEY) {
-        throw new Error("JWT_SECRET_KEY is not Defined in Environment Variables.");
-    }
+        throw new Error("JWT_SECRET_KEY Is Not Defined In Environment Variables.");
+    };
 
     const token = jwt.sign(
         payload,
