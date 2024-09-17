@@ -1,73 +1,154 @@
 import prisma from "./utils/client";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 // CREATE A USER
 async function crateAdminUser() { 
 
-    const hashPassword = bcrypt.hashSync("@lunas123", 10);
-    await prisma.admin.create({
-        data: {
-            firstname: "Danielle",
-            lastname: "Lunas",
-            email: 'lunas.danielle.10262002@gmail.com',
-            password: hashPassword,
-        },
-    });
+    try {
+        const hashPassword = bcrypt.hashSync("@lunas123", 10);
+        await prisma.admin.create({
+            data: {
+                firstname: "Danielle",
+                lastname: "Lunas",
+                email: 'lunas.danielle.10262002@gmail.com',
+                password: hashPassword,
+            },
+        });
 
-    console.log('Database Seeded Successfully.');
+        console.log('Database Seeded Successfully.');
+    } catch (error) {
+        console.error(error);
+    }
+
+}
+
+async function loginAdminUser() { 
+
+    try {
+
+        const email = "testing@gmail.com";
+        const password = "@lunas123";
+
+        const validateAdminUser = await prisma.admin.findUnique({
+            where: { 
+                email: email   
+            }
+        });
+
+        if (!validateAdminUser) {
+            console.log("Admin Not Found!");
+            return;
+        }
+
+        const isPasswordValid = bcrypt.compareSync(password, validateAdminUser.password);
+        if (!isPasswordValid) {
+            console.log("Invalid Password");
+            return;
+        }
+
+        if (!process.env.JWT_SECRET_KEY) {
+            throw new Error("JWT_SECRET_KEY is not Defined in Environment Variables.");
+        }
+
+        // GENERATE JWT FOR ADMIN USER
+        const token = jwt.sign(
+            { 
+                id: validateAdminUser.id, 
+                email: validateAdminUser.email 
+            }, 
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: '1h' }
+        );
+
+        console.log("Login Successful. JWT Token:", token);
+        return token;
+
+    } catch (error) {
+        console.error(error);
+    }
+
 }
 
 
 // GET ALL USERS
 async function getAllAdminUserss() {
 
-    const users = await prisma.admin.findMany({
-        where: {
-            deletedAt: null
-        }
-    });
+    try {
+        const users = await prisma.admin.findMany({
+            where: {
+                deletedAt: null
+            }
+        });
 
-    console.log(users);
+        console.log(users);
+    } catch (error) {
+        console.error(error);
+    }
+
 }
 
 
 // UPDATE ADMIN USER
 async function updateAdminUser() {
 
-    const hashPassword = bcrypt.hashSync("@lunas26", 10);
+    try {
 
-    const updatedAdminUser = await prisma.admin.update({
-        where: {
-            id: 4
-        },
-        data: {
-            firstname: "Danielle Ladesma",
-            lastname: "Lunas",
-            email: 'lunas.danielle.10262002@gmail.com',
-            password: hashPassword,
-        }
-    })
+        const hashPassword = bcrypt.hashSync("@lunas26", 10);
 
-    console.log(updatedAdminUser);
+        const updatedAdminUser = await prisma.admin.update({
+            where: {
+                id: 4
+            },
+            data: {
+                firstname: "Danielle Ladesma",
+                lastname: "Lunas",
+                email: 'lunas.danielle.10262002@gmail.com',
+                password: hashPassword,
+            }
+        })
+
+        console.log(updatedAdminUser);
+
+    } catch (error) {
+        console.error(error);
+    }
+    
 }
 
 
 // DELETE ADMIN USER 
 async function deleteAdminUser() {
 
-    const deletedAdminUser = await prisma.admin.update({
-        where: {
-            id: 4
-        },
-        data: {
-            deletedAt: new Date()
-        }
-    });
+    try {
 
-    console.log(deletedAdminUser);
+        const deletedAdminUser = await prisma.admin.update({
+            where: {
+                id: 4
+            },
+            data: {
+                deletedAt: new Date()
+            }
+        });
+    
+        console.log(deletedAdminUser);
+
+    } catch (error) {
+        console.error(error);
+    }
+
 }
 
-crateAdminUser()
+// crateAdminUser()
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     })
+//     .finally(async () => {
+//         await prisma.$disconnect();
+//     });
+
+loginAdminUser()
     .catch(error => {
         console.error(error);
         process.exit(1);
@@ -76,29 +157,29 @@ crateAdminUser()
         await prisma.$disconnect();
     });
 
-getAllAdminUserss()
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+// getAllAdminUserss()
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     })
+//     .finally(async () => {
+//         await prisma.$disconnect();
+//     });
 
-updateAdminUser()
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+// updateAdminUser()
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     })
+//     .finally(async () => {
+//         await prisma.$disconnect();
+//     });
 
-deleteAdminUser()
-    .catch(error => {
-        console.error(error);
-        process.exit(1);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+// deleteAdminUser()
+//     .catch(error => {
+//         console.error(error);
+//         process.exit(1);
+//     })
+//     .finally(async () => {
+//         await prisma.$disconnect();
+//     });
