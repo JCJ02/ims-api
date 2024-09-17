@@ -23,6 +23,7 @@ async function crateAdminUser() {
 
 }
 
+// LOGIN ADMIN USER
 async function loginAdminUser() { 
 
     try {
@@ -71,7 +72,7 @@ async function loginAdminUser() {
 }
 
 
-// GET ALL USERS
+// GET ALL ADMIN USERS
 async function getAllAdminUserss() {
 
     try {

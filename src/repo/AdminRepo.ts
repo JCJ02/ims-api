@@ -32,7 +32,14 @@ class AdminRepo {
                 },
             });
     
-            return newAdminUser;
+            return AppResponse.sendSuccessfull({
+                res,
+                data: {
+                    user: newAdminUser
+                },
+                message: "Successfully Registered!",
+                code: 201
+            });
 
         } catch (error: any) {
             AppResponse.sendErrors({

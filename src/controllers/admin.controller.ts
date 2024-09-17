@@ -37,23 +37,8 @@ class AdminController {
     async create(req: Request, res: Response) {
 
         try {
-            const admin = await this.adminService.create(req.body, req, res);
-    
-            if (!admin) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: "Registration Unsuccessful!",
-                    code: 400
-                });
-            }
-    
-            return AppResponse.sendSuccessfull({
-                res,
-                data: { user: admin },
-                message: "Successfully Registered!",
-                code: 201
-            });
+
+            await this.adminService.create(req.body, req, res);
     
         } catch (error: any) {
             return AppResponse.sendErrors({
@@ -69,14 +54,9 @@ class AdminController {
     // LOGIN ADMIN
     async loginAdmin(req: Request, res: Response) {
         try {
-            const admin = await this.adminService.loginAdmin(req.body, req, res);
 
-            return AppResponse.sendSuccessfull({
-                res,
-                data: { user: admin },
-                message: "Login Successful!",
-                code: 200
-            });
+            await this.adminService.loginAdmin(req.body, req, res);
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
