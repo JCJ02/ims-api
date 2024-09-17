@@ -17,7 +17,7 @@ model Admin {
   id              Int       @id @default(autoincrement())
   firstname       String
   lastname        String
-  email           String
+  email           String    @unique
   password        String
   confirmPassword String?
   createdAt       DateTime  @default(now())
