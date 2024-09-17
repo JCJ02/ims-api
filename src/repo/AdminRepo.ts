@@ -32,7 +32,7 @@ class AdminRepo {
                 },
             });
     
-            return AppResponse.sendSuccessfull({
+            return AppResponse.sendSuccessful({
                 res,
                 data: {
                     user: newAdmin
@@ -83,7 +83,7 @@ class AdminRepo {
 
             const token = generateToken(validateAdminUser);
     
-            return AppResponse.sendSuccessfull({
+            return AppResponse.sendSuccessful({
                 res,
                 data: { 
                     user: validateAdminUser,

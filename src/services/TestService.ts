@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import TestRepo from "../repo/TestRepo";
 
 class TestService {
@@ -8,8 +9,8 @@ class TestService {
         this.test = new TestRepo();
     }
 
-    async index(){
-        return this.test.index();
+    async index(req: Request, res: Response){
+        return this.test.index(req, res);
     }
 
 }

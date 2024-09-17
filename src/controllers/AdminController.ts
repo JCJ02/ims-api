@@ -24,14 +24,7 @@ class AdminController {
 
         try {
 
-            const message = await this.testService.index();
-
-            return AppResponse.sendSuccessfull({
-                res,
-                data: message,
-                message: "Successfull!",
-                code: 200
-            });
+            await this.testService.index(req, res);
 
         } catch (error: any) {
             return AppResponse.sendErrors({
