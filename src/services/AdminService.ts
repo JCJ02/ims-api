@@ -1,21 +1,59 @@
 import AdminRepo from "../repo/AdminRepo";
-import { Request, Response } from "express";
+import { generateToken } from "../utils/token";
+import bcrypt from "bcryptjs";
 
 class AdminService {
 
     private adminRepo;
 
-    constructor(){
+    constructor() {
         this.adminRepo = new AdminRepo();
     }
 
-    async createAdmin(data: any, req: Request, res: Response){
-        return this.adminRepo.createAdmin(data, req, res);
+    async createAdmin(data: any) {
+
+        const hashPassword = bcrypt.hashSync(data.password, 10);
+
+        const adminData = {
+            ...data,
+            password: hashPassword,
+        };
+
+        const newAdmin = await this.adminRepo.createAdmin(adminData);
+
+        return newAdmin;
+
     }
 
-    async loginAdmin(data: any, req: Request, res: Response){
-        return this.adminRepo.loginAdmin(data, req, res);
+    async authenticate(data: any){
+        
+        const admin = await this.adminRepo.authenticate(data.email);
+
+        if (!admin) {
+            return null;
+        }
+
+        const isPasswordValid = bcrypt.compareSync(data.password, admin.password);
+        if (!isPasswordValid) {
+            return null;
+        }
+
+        const token = generateToken({
+            id: data.id
+        });
+        
+        return token;
+
     }
+
+    async show(id: number){
+        
+        const admin = await this.adminRepo.show(id);
+
+        return admin;
+
+    }
+
 }
 
 export default AdminService;

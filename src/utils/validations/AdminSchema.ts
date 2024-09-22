@@ -3,7 +3,7 @@ import { z } from "zod";
 const adminSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
-        invalid_type_error: "Firstname Must Be A Strin!"
+        invalid_type_error: "Firstname Must Be A String!"
     })
         .min(3, "Firstname Must Be At Least 3 Characters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
@@ -23,6 +23,18 @@ const adminSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"], 
     message: "Password And Confirm Password Are Not Match!",
-});;
+});
 
-export default adminSchema;
+const adminAuthSchema = z.object({
+    email: z.string({
+        required_error: "E-mail Is Required!"
+    }).email("Must Be A Valid Email!"),
+    password: z.string({
+        required_error: "Password Is Required!"
+    })
+});
+
+export {
+    adminSchema,
+    adminAuthSchema
+}

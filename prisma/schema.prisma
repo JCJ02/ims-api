@@ -23,4 +23,5 @@ model Admin {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
+  role            String?   @default("Admin")
 }

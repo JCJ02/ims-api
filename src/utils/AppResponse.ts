@@ -17,8 +17,21 @@ class AppResponse {
     }
 
     static sendErrors({res, message, data, code}: appResponseParams): void {
+
+        let returnMessage;
+
+        if(code !== 500) {
+            returnMessage = message;
+        } else {
+            if(process.env.ENV == "development") {
+                returnMessage = message;
+            } else {
+                returnMessage = "Internal Server Error!";
+            }
+        }
+
         res.status(code).json({
-            message,
+            message: returnMessage,
             data,
             code
         })

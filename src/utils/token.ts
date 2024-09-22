@@ -15,7 +15,18 @@ const generateToken = (payload: any) => {
         { expiresIn: '1h' }
     );
 
-    return token
+    return token;
 }
 
-export default generateToken;
+const verifyToken = (token: string) => {
+
+    const verifiedToken = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+  
+    return verifiedToken;
+
+};
+
+export {
+    generateToken,
+    verifyToken
+};
