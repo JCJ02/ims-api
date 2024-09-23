@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import AppResponse from "../utils/AppResponse";
 import TestService from "../services/TestService";
 import AdminService from "../services/AdminService";
-import { adminSchema, adminAuthSchema } from "../utils/validations/AdminSchema";
+import { adminSchema, authAdminSchema, updateAdminSchema, updateAdminPasswordSchema } from "../utils/validations/AdminSchema";
 import { authAdminRequest } from "../types/AdminType";
 
 class AdminController {
@@ -18,6 +18,9 @@ class AdminController {
         this.index = this.index.bind(this);
         this.createAdmin = this.createAdmin.bind(this);
         this.authenticate = this.authenticate.bind(this);
+        this.updateAdmin = this.updateAdmin.bind(this);
+        this.updateAdminPassword = this.updateAdminPassword.bind(this);
+        this.getAdmin = this.getAdmin.bind(this);
 
     }
 
@@ -27,7 +30,7 @@ class AdminController {
         try {
 
             const admin = req.admin;
-
+            //console.log(admin);
             if(!admin) {
                 return AppResponse.sendErrors({
                     res,
@@ -39,7 +42,11 @@ class AdminController {
                 return AppResponse.sendSuccessful({
                     res,
                     data: {
-                        admin: admin.email
+                        id: admin.id,
+                        firstname: admin.firstname,
+                        lastname: admin.lastname,
+                        email: admin.email,
+                        password: admin.password
                     },
                     message: "Admin Found!",
                     code: 200
@@ -64,27 +71,36 @@ class AdminController {
 
         try {
 
-            const validation = adminSchema.safeParse(req.body);
+            const validateAdminData = adminSchema.safeParse(req.body);
 
-            if(validation.error) {
+            if(validateAdminData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: validation.error.errors[0].message,
+                    message: validateAdminData.error.errors[0].message,
                     code: 400
                 });
             }
 
-            const newAdmin = await this.adminService.createAdmin(validation.data);
+            const newAdmin = await this.adminService.createAdmin(validateAdminData.data);
 
-            return AppResponse.sendSuccessful({
-                res,
-                data: {
-                    admin: newAdmin
-                },
-                message: "Admin Registered Successfully!",
-                code: 201
-            });
+            if(!newAdmin) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Unsuccessful Update!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: {
+                        admin: newAdmin
+                    },
+                    message: "Successfully Registered!",
+                    code: 201
+                });
+            }
     
         } catch (error: any) {
             return AppResponse.sendErrors({
@@ -101,8 +117,8 @@ class AdminController {
     async authenticate(req: Request, res: Response) {
 
         try {
-
-            const validation = adminAuthSchema.safeParse(req.body);
+            //console.log("Raw request body: ", req.body);
+            const validation = authAdminSchema.safeParse(req.body);
 
             if(validation.error) {
                 return AppResponse.sendErrors({
@@ -112,9 +128,9 @@ class AdminController {
                     code: 400
                 });
             }
-
+            //console.log("Validation: ",validation);
             const result = await this.adminService.authenticate(validation.data);
-
+            //console.log("Result: ", result);
             if (!result) {
                 return AppResponse.sendErrors({
                     res,
@@ -141,6 +157,126 @@ class AdminController {
         }
         
     }
+
+    // UPDATE ADMIN 
+    async updateAdmin(req: Request, res: Response) {
+
+        try {
+
+            const validateAdminData = updateAdminSchema.safeParse(req.body);
+
+            if(validateAdminData.error) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: validateAdminData.error.errors[0].message,
+                    code: 400
+                });
+            }
+
+            const admin = await this.adminService.updateAdmin(req, validateAdminData.data);
+
+            if(!admin) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Unsuccessful Update!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: {
+                        admin: admin
+                    },
+                    message: "Successfully Updated!",
+                    code: 201
+                });
+            }
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
+    // ADMIN ADMIN PASSWORD
+    async updateAdminPassword(req: Request, res: Response) {
+
+        try {
+
+            const id = Number(req.params.id);
+
+            if (isNaN(id) || id <= 0) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Invalid Admin ID!",
+                    code: 400,
+                });
+            }
+
+            const validatePasswordData = updateAdminPasswordSchema.safeParse(req.body);
+
+            if (validatePasswordData.error) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: validatePasswordData.error.errors[0].message,
+                    code: 400
+                });
+            }
+
+            const updatedAdmin = await this.adminService.updateAdminPassword(req, validatePasswordData.data);
+
+            if (!updatedAdmin) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin Not Found Or Failed To Update Password!",
+                    code: 404,
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: { admin: updatedAdmin },
+                    message: "Password Updated Successfully!",
+                    code: 200
+                });    
+            }
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
+    // GET ADMIN 
+    async getAdmin(req: Request, res: Response) {
+
+        try {
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
 }
 
 export default AdminController;

@@ -18,27 +18,63 @@ class AdminRepo {
     }
 
     async authenticate(data: any) {
-
+        //console.log("Email: ", data.email);
         const admin = await prisma.admin.findFirst({
             where: {
-                email: data.email
+                email: data.email,
+                deletedAt: null
             }
         });
-
+        //console.log("Admin: ", admin);
         return admin;
 
     }
 
     async show(id: number) {
 
-        const admin = await prisma.admin.findFirst({
+        const adminId = await prisma.admin.findFirst({
             where: {
                 id: id,
                 deletedAt: null
             }
         });
 
-        return admin;
+        return adminId;
+
+    }
+
+    // UPDATE ADMIN
+    async updateAdmin(data: any) {
+
+        const editAdmin = await prisma.admin.update({
+            where: {
+                id: data.id
+            },
+            data: {
+                firstname: data.firstname,
+                lastname: data.lastname,
+                email: data.email,
+            }
+        });
+
+        return editAdmin;
+
+    }
+
+    // UPDATE ADMIN PASSWORD
+    async updateAdminPassword(id: number, newPassword: string) {
+
+        const editAdminPassword = await prisma.admin.update({
+            where: { id: id },
+            data: { password: newPassword }
+        });
+
+        return editAdminPassword;
+
+    }
+
+    async getAdmin(data: any) {
+
 
     }
 

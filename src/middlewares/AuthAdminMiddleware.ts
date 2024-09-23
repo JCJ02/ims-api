@@ -23,8 +23,8 @@ const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: N
         }
 
         const verifiedToken = verifyToken(token) as any;
-
-        if(verifiedToken.role === "Intern") {
+        //console.log(verifiedToken);
+        if(verifiedToken.role !== "Admin") {
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -34,7 +34,7 @@ const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: N
         }
         
         const admin = await adminService.show(verifiedToken.id);
-
+        //console.log(admin);
         if(!admin) {
             return AppResponse.sendErrors({
                 res,
@@ -64,7 +64,7 @@ const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: N
                 data: null,
                 message: error.message,
                 code: 500
-            })
+            });
         }
 
     }
