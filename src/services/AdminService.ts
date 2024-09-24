@@ -30,13 +30,13 @@ class AdminService {
     async authenticate(data: any){
         
         const admin = await this.adminRepo.authenticate(data);
-
+        // console.log("Admin Data: ",admin);
         if (!admin) {
             return null;
         }
 
-        const isPasswordValid = bcrypt.compare(data.password, admin.password);
-        
+        const isPasswordValid = bcrypt.compareSync(data.password, admin.password);
+        // console.log("Comparision: ", isPasswordValid);
         if (!isPasswordValid) {
             return null;
         }
@@ -86,16 +86,18 @@ class AdminService {
         if (!admin) {
             return null;
         }
+        console.log("Services File, Admin ID: ", admin);
 
         const isPasswordValid = bcrypt.compareSync(data.password, admin.password);
 
         if (!isPasswordValid) {
             return null
         }
+        console.log("Comparision: ", isPasswordValid);
 
         const hashedNewPassword = bcrypt.hashSync(data.password, 10);
-
-        const editedAdminPassword = await this.adminRepo.updateAdminPassword(id, hashedNewPassword);
+        console.log("Hashed Password: ", hashedNewPassword);
+        const editedAdminPassword = await this.adminRepo.updateAdminPassword(admin.id, hashedNewPassword);
 
         return editedAdminPassword;
 

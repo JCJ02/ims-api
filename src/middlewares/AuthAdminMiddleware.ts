@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import AppResponse from "../utils/AppResponse";
 import { verifyToken } from "../utils/token";
 import { JsonWebTokenError } from "jsonwebtoken";

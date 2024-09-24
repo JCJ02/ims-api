@@ -9,6 +9,7 @@ adminRoute.get("/test", authAdminMiddleware, adminController.index);
 adminRoute.post("/create", adminController.createAdmin);
 adminRoute.post("/authenticate", adminController.authenticate);
 adminRoute.put("/update/:id", adminController.updateAdmin);
-adminRoute.put("/update-password/:id", adminController.updateAdminPassword); // Check this if it is good?
+adminRoute.put("/update-password/:id", adminController.updateAdminPassword); 
+
 
 export default adminRoute;

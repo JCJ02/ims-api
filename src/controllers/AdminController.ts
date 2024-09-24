@@ -88,7 +88,7 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Unsuccessful Update!",
+                    message: "Failed To Register!",
                     code: 403
                 });
             } else {
@@ -164,7 +164,7 @@ class AdminController {
         try {
 
             const validateAdminData = updateAdminSchema.safeParse(req.body);
-
+            // console.log(validateAdminData);
             if(validateAdminData.error) {
                 return AppResponse.sendErrors({
                     res,
@@ -175,12 +175,12 @@ class AdminController {
             }
 
             const admin = await this.adminService.updateAdmin(req, validateAdminData.data);
-
+            // console.log(admin);
             if(!admin) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Unsuccessful Update!",
+                    message: "Failed To Update!",
                     code: 403
                 });
             } else {
@@ -220,9 +220,10 @@ class AdminController {
                     code: 400,
                 });
             }
-
+            console.log("Admin ID: ", id);
+            
             const validatePasswordData = updateAdminPasswordSchema.safeParse(req.body);
-
+            console.log(validatePasswordData);
             if (validatePasswordData.error) {
                 return AppResponse.sendErrors({
                     res,
@@ -232,9 +233,9 @@ class AdminController {
                 });
             }
 
-            const updatedAdmin = await this.adminService.updateAdminPassword(req, validatePasswordData.data);
-
-            if (!updatedAdmin) {
+            const updatedAdminPassword = await this.adminService.updateAdminPassword(req, validatePasswordData.data);
+            console.log("Updated Admin Password", updatedAdminPassword);
+            if (!updatedAdminPassword) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -244,7 +245,7 @@ class AdminController {
             } else {
                 return AppResponse.sendSuccessful({
                     res,
-                    data: { admin: updatedAdmin },
+                    data: { admin: updatedAdminPassword },
                     message: "Password Updated Successfully!",
                     code: 200
                 });    
