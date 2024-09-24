@@ -43,16 +43,6 @@ const updateAdminSchema = z.object({
     }).email("Must Be A Valid Email!"),
 });
 
-// const updateAdminPasswordSchema = z.object({
-//     password: z.string()
-//         .min(8, "Password Must Be At Least 8 Characters Long!")
-//         .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])/, "Password Must Containt At Least One Number And One Special Character!"),
-//     confirmPassword: z.string().optional().nullable()
-// }).refine((data) => data.password === data.confirmPassword, {
-//     path: ["confirmPassword"], 
-//     message: "Password And Confirm Password Are Not Match!",
-// });
-
 const updateAdminPasswordSchema = z.object({
     currentPassword: z.string()
         .min(8, "Password Must Be At Least 8 Characters Long!")
@@ -62,7 +52,7 @@ const updateAdminPasswordSchema = z.object({
         .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])/, "Password Must Containt At Least One Number And One Special Character!"),
     confirmPassword: z.string().optional().nullable()
 }).refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords Do Dot Match",
+    message: "New Password and Confirm Password Do Dot Match",
     path: ["confirmPassword"],
 });
 

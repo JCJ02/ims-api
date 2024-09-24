@@ -77,34 +77,30 @@ class AdminService {
 
     }
 
-    async updateAdminPassword(req: Request, data: any) {
-
-        const id = Number(req.params.id);
+    async updateAdminPassword(id: number, data: { newPassword: string, currentPassword: string }) {
 
         const admin = await this.adminRepo.show(id);
 
-        if (!admin) {
-            return null;
-        }
-        console.log("Services File, Admin ID: ", admin);
-
-        const isPasswordValid = bcrypt.compareSync(data.password, admin.password);
-
-        if (!isPasswordValid) {
+        if(!admin) {
             return null
         }
-        console.log("Comparision: ", isPasswordValid);
+        // console.log("Admin ID: ", admin);
+        
+        const isPasswordEqual = bcrypt.compareSync(data.currentPassword, admin.password);
 
-        const hashedNewPassword = bcrypt.hashSync(data.password, 10);
-        console.log("Hashed Password: ", hashedNewPassword);
-        const editedAdminPassword = await this.adminRepo.updateAdminPassword(admin.id, hashedNewPassword);
+        if(!isPasswordEqual) {
+            return null
+        }
 
-        return editedAdminPassword;
+        const hashedNewPassword = bcrypt.hashSync(data.newPassword, 10);
+
+        const updatedPassword = await this.adminRepo.updateAdminPassword(admin.id, { newPassword: hashedNewPassword, currentPassword: data.currentPassword });
+
+        return updatedPassword;
 
     }
 
     async getAdmin(data: any) {
-
 
     }
 

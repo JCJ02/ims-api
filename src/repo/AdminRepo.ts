@@ -62,11 +62,13 @@ class AdminRepo {
     }
 
     // UPDATE ADMIN PASSWORD
-    async updateAdminPassword(id: number, data: any) {
+    async updateAdminPassword(id: number, data: { newPassword: string, currentPassword: string }) {
 
         const editAdminPassword = await prisma.admin.update({
-            where: { id: id },
-            data: { password: data.password }
+            where: { 
+                id: id, 
+            },
+            data: { password: data.newPassword }
         });
 
         return editAdminPassword;

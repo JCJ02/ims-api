@@ -208,47 +208,38 @@ class AdminController {
     // ADMIN ADMIN PASSWORD
     async updateAdminPassword(req: Request, res: Response) {
 
-        try {
+        try {       
 
             const id = Number(req.params.id);
 
-            if (isNaN(id) || id <= 0) {
+            const validatePasswords = updateAdminPasswordSchema.safeParse(req.body);
+
+            if(validatePasswords.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Invalid Admin ID!",
-                    code: 400,
-                });
-            }
-            console.log("Admin ID: ", id);
-            
-            const validatePasswordData = updateAdminPasswordSchema.safeParse(req.body);
-            console.log(validatePasswordData);
-            if (validatePasswordData.error) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: validatePasswordData.error.errors[0].message,
+                    message: validatePasswords.error.errors[0].message,
                     code: 400
                 });
             }
+            // console.log("Validated Password: ", validatePasswords);
 
-            const updatedAdminPassword = await this.adminService.updateAdminPassword(req, validatePasswordData.data);
-            console.log("Updated Admin Password", updatedAdminPassword);
-            if (!updatedAdminPassword) {
+            const updatedPassword = await this.adminService.updateAdminPassword(id, validatePasswords.data);
+            // console.log("Updated Password: ", updatedPassword);
+            if(!updatedPassword) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Admin Not Found Or Failed To Update Password!",
-                    code: 404,
+                    message: "Failed To Update Password!",
+                    code: 403
                 });
             } else {
                 return AppResponse.sendSuccessful({
                     res,
-                    data: { admin: updatedAdminPassword },
-                    message: "Password Updated Successfully!",
-                    code: 200
-                });    
+                    data: null,
+                    message: "Successfully Updated Password!",
+                    code: 201
+                });
             }
 
         } catch (error: any) {

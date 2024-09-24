@@ -25,3 +25,27 @@ model Admin {
   deletedAt       DateTime?
   role            String?   @default("Admin")
 }
+
+// model Admin {
+//   id              Int       @id @default(autoincrement())
+//   firstname       String
+//   lastname        String
+//   email           String
+//   password        String
+//   confirmPassword String?
+//   createdAt       DateTime  @default(now())
+//   updatedAt       DateTime  @updatedAt
+//   deletedAt       DateTime?
+//   role            String?   @default("Admin")
+//   account         Account[]
+// }
+
+// model Account {
+//   id         Int       @id @default(autoincrement())
+//   password   String
+//   admin_id   Int?
+//   created_at DateTime? @default(now())
+//   updated_at DateTime? @updatedAt
+//   deleted_at DateTime?
+//   admin      Admin?    @relation(fields: [admin_id], references: [id])
+// }
