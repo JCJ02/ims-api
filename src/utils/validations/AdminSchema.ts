@@ -3,13 +3,13 @@ import { z } from "zod";
 const adminSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
-        invalid_type_error: "Firstname Must Be A String!"
+        invalid_type_error: "Firstname Must Be String!"
     })
         .min(3, "Firstname Must Be At Least 3 Characters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
     lastname: z.string({
     required_error: "Firstname Is Required!",
-        invalid_type_error: "Firstname Must Be A String!"
+        invalid_type_error: "Firstname Must Be String!"
     })
         .min(3, "Firstname Must Be At Least 3 Charaters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
@@ -28,13 +28,13 @@ const adminSchema = z.object({
 const updateAdminSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
-        invalid_type_error: "Firstname Must Be A String!"
+        invalid_type_error: "Firstname Must Be String!"
     })
         .min(3, "Firstname Must Be At Least 3 Characters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
     lastname: z.string({
     required_error: "Firstname Is Required!",
-        invalid_type_error: "Firstname Must Be A String!"
+        invalid_type_error: "Firstname Must Be String!"
     })
         .min(3, "Firstname Must Be At Least 3 Charaters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
