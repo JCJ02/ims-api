@@ -92,7 +92,74 @@ class RoleRepo {
             totalRoles,
         };
 
-    }   
+    }
+
+    // SEARCH ROLES METHOD
+    async searchRoles(query: string, skip: number, limit: number) {
+
+        const roles = await prisma.role.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: null,
+                OR: [
+                    {
+                        roleId: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleName: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleDescription: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalRoles = await prisma.role.count({
+            where: {
+                deletedAt: null,
+                OR: [
+                    {
+                        roleId: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleName: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleDescription: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
+
+        return {
+            roles,
+            totalRoles,
+        };
+
+    }
 
 }
 
