@@ -6,11 +6,17 @@ export interface authAdminRequest extends Request {
     email: string,
     firstname: string,
     lastname: string,
-    password: string,
-    confirmPassword?: string | null,
     createdAt: Date,
     updatedAt: Date,
     deletedAt?: Date | null,
-    role?: string | null
+    role?: string | null,
+    // account: {
+    //   id: number,
+    //   password: string,
+    //   admin_id: number,
+    //   createdAt: Date,
+    //   updatedAt: Date,
+    //   deletedAt: Date
+    // }
   } | undefined
 }
