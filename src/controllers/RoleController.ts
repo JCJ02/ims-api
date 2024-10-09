@@ -119,7 +119,7 @@ class RoleController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Role Not Found!",
+                    message: "Delete Unsuccessful!",
                     code: 404
                 });
             } else {
@@ -147,21 +147,12 @@ class RoleController {
 
             const paginatedRoles = await this.roleService.getRoles(req);
 
-            if(!paginatedRoles) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: "Roles Not Found!",
-                    code: 403
-                });
-            } else {
-                return AppResponse.sendSuccessful({
-                    res,
-                    data: paginatedRoles,
-                    message: "List Of Roles!",
-                    code: 201,
-                });
-            }
+            return AppResponse.sendSuccessful({
+                res,
+                data: paginatedRoles,
+                message: "List Of Roles!",
+                code: 201,
+            });
 
         } catch (error: any) {
 
@@ -181,21 +172,12 @@ class RoleController {
 
             const searchResults = await this.roleService.searchRoles(req);
 
-            if(!searchResults) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: "Search Not Found!",
-                    code: 403
-                });
-            } else {
-                return AppResponse.sendSuccessful({
-                    res,
-                    data: searchResults,
-                    message: "Search Succssfully Found!",
-                    code: 201
-                })
-            }
+            return AppResponse.sendSuccessful({
+                res,
+                data: searchResults,
+                message: "Search Sucessfully!",
+                code: 201
+            })
             
         } catch (error: any) {
             
