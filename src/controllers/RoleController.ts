@@ -15,6 +15,7 @@ class RoleController {
         this.updateRole = this.updateRole.bind(this);
         this.deleteRole = this.deleteRole.bind(this);
         this.getRoles = this.getRoles.bind(this);
+        this.searchRoles = this.searchRoles.bind(this);
 
     }
 
@@ -146,12 +147,21 @@ class RoleController {
 
             const paginatedRoles = await this.roleService.getRoles(req);
 
-            return AppResponse.sendSuccessful({
-                res,
-                data: paginatedRoles,
-                message: "List Of Roles!",
-                code: 200,
-            });
+            if(!paginatedRoles) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Roles Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: paginatedRoles,
+                    message: "List Of Roles!",
+                    code: 201,
+                });
+            }
 
         } catch (error: any) {
 
@@ -161,6 +171,40 @@ class RoleController {
                 message: error.message,
                 code: 500,
             });
+
+        }
+    }
+
+    // SEARCH ROLES METHOD
+    async searchRoles(req: Request, res: Response) {
+        try {
+
+            const searchResults = await this.roleService.searchRoles(req);
+
+            if(!searchResults) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Search Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: searchResults,
+                    message: "Search Succssfully Found!",
+                    code: 201
+                })
+            }
+            
+        } catch (error: any) {
+            
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            })
 
         }
     }
