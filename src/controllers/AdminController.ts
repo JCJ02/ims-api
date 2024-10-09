@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import AppResponse from "../utils/AppResponse";
-import TestService from "../services/TestService";
+// import TestService from "../services/TestService";
 import AdminService from "../services/AdminService";
 import { adminSchema, authAdminSchema, updateAdminSchema, updateAdminPasswordSchema } from "../utils/validations/AdminSchema";
 import { authAdminRequest } from "../types/AdminType";
 
 class AdminController {
 
-    private testService;
+    //private testService;
     private adminService;
 
     constructor() {
 
-        this.testService = new TestService();
+        // this.testService = new TestService();
         this.adminService = new AdminService();
 
         this.index = this.index.bind(this);
@@ -20,11 +20,10 @@ class AdminController {
         this.authenticate = this.authenticate.bind(this);
         this.updateAdmin = this.updateAdmin.bind(this);
         this.updateAdminPassword = this.updateAdminPassword.bind(this);
-        this.getAdmin = this.getAdmin.bind(this);
+        this.getAllAdmin = this.getAllAdmin.bind(this);
 
     }
 
-    // TEST
     async index(req: authAdminRequest, res: Response) {
 
         try {
@@ -46,7 +45,7 @@ class AdminController {
                         firstname: admin.firstname,
                         lastname: admin.lastname,
                         email: admin.email,
-                        password: admin.password
+                        role: admin.role
                     },
                     message: "Admin Found!",
                     code: 200
@@ -66,7 +65,7 @@ class AdminController {
 
     }
 
-    // CREATE ADMIN
+    // CREATE ADMIN METHOD
     async createAdmin(req: Request, res: Response) {
 
         try {
@@ -88,7 +87,7 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Failed To Register!",
+                    message: "Failed To Register Credentials!",
                     code: 403
                 });
             } else {
@@ -113,7 +112,7 @@ class AdminController {
 
     }
 
-    // AUTHENTICATE ADMIN
+    // AUTHENTICATE OR LOGIN ADMIN METHOD
     async authenticate(req: Request, res: Response) {
 
         try {
@@ -135,7 +134,7 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Invalid Login",  
+                    message: "Invalid Login Credentials!",  
                     code: 401
                 });
             } else {
@@ -158,7 +157,7 @@ class AdminController {
         
     }
 
-    // UPDATE ADMIN 
+    // UPDATE ADMIN METHOD
     async updateAdmin(req: Request, res: Response) {
 
         try {
@@ -172,26 +171,29 @@ class AdminController {
                     message: validateAdminData.error.errors[0].message,
                     code: 400
                 });
-            }
-
-            const admin = await this.adminService.updateAdmin(req, validateAdminData.data);
-            // console.log(admin);
-            if(!admin) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: "Failed To Update!",
-                    code: 403
-                });
             } else {
-                return AppResponse.sendSuccessful({
-                    res,
-                    data: {
-                        admin: admin
-                    },
-                    message: "Successfully Updated!",
-                    code: 201
-                });
+
+                const admin = await this.adminService.updateAdmin(req, validateAdminData.data);
+                // console.log(admin);
+
+                if(!admin) {
+                    return AppResponse.sendErrors({
+                        res,
+                        data: null,
+                        message: "Failed To Update!",
+                        code: 403
+                    });
+                } else {
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: {
+                            admin: admin
+                        },
+                        message: "Successfully Updated!",
+                        code: 201
+                    });
+                }
+                
             }
             
         } catch (error: any) {
@@ -205,12 +207,12 @@ class AdminController {
 
     }
 
-    // ADMIN ADMIN PASSWORD
+    // ADMIN ADMIN PASSWORD METHOD
     async updateAdminPassword(req: Request, res: Response) {
 
         try {       
 
-            const id = Number(req.params.id);
+            const adminId = Number(req.params.id);
 
             const validatePasswords = updateAdminPasswordSchema.safeParse(req.body);
 
@@ -222,15 +224,15 @@ class AdminController {
                     code: 400
                 });
             }
-            // console.log("Validated Password: ", validatePasswords);
+            //console.log("Validated Password: ", validatePasswords);
 
-            const updatedPassword = await this.adminService.updateAdminPassword(id, validatePasswords.data);
-            // console.log("Updated Password: ", updatedPassword);
+            const updatedPassword = await this.adminService.updateAdminPassword(adminId, validatePasswords.data);
+            //console.log("Updated Password: ", updatedPassword);
             if(!updatedPassword) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Failed To Update Password!",
+                    message: "Incorrect Current Password!",
                     code: 403
                 });
             } else {
@@ -253,11 +255,31 @@ class AdminController {
 
     }
 
-    // GET ADMIN 
-    async getAdmin(req: Request, res: Response) {
+    // GET ALL ADMIN METHOD
+    async getAllAdmin(req: Request, res: Response) {
 
         try {
             
+            const validation = await this.adminService.getAllAdmin(req.body);
+
+            if(!validation) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin Not Found!",
+                    code: 404
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: {
+                        admin: validation
+                    },
+                    message: "List Of Admin!",
+                    code: 404
+                });
+            }
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
