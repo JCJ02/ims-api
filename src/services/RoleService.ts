@@ -80,6 +80,21 @@ class RoleService {
 
     }
 
+    // SEARCH ROLES METHOD
+    async searchRoles(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const query = req.query.query as string || '';
+
+        const skip = (page - 1) * limit;
+
+        const searchResults = await this.roleRepo.searchRoles(query, skip, limit);
+
+        return searchResults;
+
+    }
+
 }
 
 export default RoleService;
