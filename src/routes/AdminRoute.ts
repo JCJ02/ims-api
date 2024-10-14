@@ -11,6 +11,7 @@ adminRoute.post("/create", adminController.createAdmin);
 adminRoute.post("/authenticate", adminController.authenticate);
 adminRoute.put("/update/:id", adminController.updateAdmin);
 adminRoute.put("/update-password/:id", adminController.updateAdminPassword); 
-adminRoute.post("/update-password/:id", adminController.updateAdminPassword); 
+adminRoute.post("/update-password/:id", adminController.updateAdminPassword);
+adminRoute.put("/delete-admin/:id", adminController.deleteAdmin);
 
 export default adminRoute;
