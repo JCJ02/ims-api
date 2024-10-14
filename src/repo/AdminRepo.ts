@@ -106,6 +106,32 @@ class AdminRepo {
 
     }
 
+    // DELETE ADMIN METHOD
+    async deleteAdmin(id: number) {
+        const softDeleteAdmin = await prisma.admin.update({
+            where: {
+                id: id,
+                deletedAt: null,
+            },
+            data: {
+                deletedAt: new Date(),
+                account: {
+                    updateMany: {
+                        where: {
+                            adminId: id,
+                            deletedAt: null
+                        },
+                        data: {
+                            deletedAt: new Date(),
+                        },
+                    },
+                },
+            },
+        });
+
+        return softDeleteAdmin;
+    }
+
 }
 
 export default AdminRepo;
