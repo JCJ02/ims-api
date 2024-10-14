@@ -11,6 +11,7 @@
             this.adminRepo = new AdminRepo();
         }
 
+        // CREATE ADMIN METHOD
         async createAdmin(data: any) {
 
             const hashedPassword = bcrypt.hashSync(data.password, 10);
@@ -27,6 +28,7 @@
 
         }
 
+        // AUTHENTICATE OR LOG IN ADMIN METHOD
         async authenticate(data: any){
             
             const admin = await this.adminRepo.authenticate(data);
@@ -50,12 +52,14 @@
 
         }
 
+        // SHOW METHOD
         async show(id: number){
             
             return await this.adminRepo.show(id);
 
         }
 
+        // UPDATE ADMIN METHOD
         async updateAdmin(req: Request, data: any) {
 
             const id = Number(req.params.id);
@@ -69,6 +73,7 @@
 
         }
 
+        // UPDATE ADMIN PASSWORD METHOD
         async updateAdminPassword(id: number, data: { currentPassword: string, newPassword: string } ) {
 
             const admin = await this.adminRepo.show(id);
@@ -93,6 +98,7 @@
 
         }
 
+        // GET ALL ADMIN METHOD
         async getAllAdmin(data: any) {
 
             const isAdminEmpty = await this.adminRepo.getAllAdmin(data);
@@ -102,6 +108,23 @@
             } else {
                 return isAdminEmpty;
             }
+
+        }
+
+        
+
+        // DELETE ADMIN METHOD
+        async deleteAdmin(id: number) {
+            
+            const admin = await this.adminRepo.show(id);
+            // console.log(Admin: ${admin});
+            if(!admin) {
+                return null;
+            }
+
+            const deletedAdmin = await this.adminRepo.deleteAdmin(admin.id);
+            // console.log(ID: ${deletedAdmin});
+            return deletedAdmin;
 
         }
 
