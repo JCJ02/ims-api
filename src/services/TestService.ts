@@ -1,16 +1,15 @@
-import { Request, Response } from "express";
 import TestRepo from "../repo/TestRepo";
 
 class TestService {
 
-    private test
+    private testRepo;
 
     constructor(){
-        this.test = new TestRepo();
+        this.testRepo = new TestRepo();
     }
 
-    async index(req: Request, res: Response){
-        return this.test.index(req, res);
+    async index(data: { message: string }){
+        return this.testRepo.index(data);
     }
 
 }
