@@ -1,7 +1,7 @@
 import prisma from "./utils/client";
 import bcrypt from "bcryptjs";
 
-// CREATE AN ADMIN USER
+// CREATE ADMIN METHOD
 async function createAdmin() { 
 
     try {
@@ -37,31 +37,6 @@ async function createAdmin() {
     
 }
 
-async function createRole() {
-
-    try {
-        
-        await prisma.role.create({
-            data: {
-                roleId: "24-0001",
-                roleName: "Admin",
-                roleDescription: "Adminstrator"
-            }
-        });
-
-        console.log("Successfully Created!")
-
-    } catch (error) {
-        
-        console.error("ERROR Seeding Database: ", error)
-
-    } finally {
-
-        await prisma.$disconnect();
-
-    }
-
-}
 
 createAdmin()
     .catch(error => {
@@ -69,8 +44,3 @@ createAdmin()
         process.exit(1);
     });
 
-createRole()
-    .catch(error => {
-        console.error("Error In Role Creation: ", error);
-        process.exit(1);
-    });
