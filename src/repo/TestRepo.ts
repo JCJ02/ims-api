@@ -1,19 +1,11 @@
-import { Request, Response } from "express";
-import AppResponse from "../utils/AppResponse";
 
 class TestRepo {
 
-    async index(req: Request, res: Response){
+    async index(data: { message: string }){
 
-        const data = "Hello World!";
-
-        return AppResponse.sendSuccessful({
-            res,
-            data: data,
-            message: "Successful Response!",
-            code: 200
-        });
+        data.message = "Hello World!";
         
+        return data;
     }
 
 }
