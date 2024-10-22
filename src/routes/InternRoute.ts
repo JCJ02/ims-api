@@ -13,5 +13,6 @@ internRoute.put("/update-password/:id", internController.updateInternPassword);
 internRoute.put("/delete/:id", internController.deleteIntern);
 internRoute.get("/get-interns", internController.getInterns);
 internRoute.get("/get-interns/search", internController.searchInterns);
+internRoute.put("/reset-password/:id", internController.resetInternPassword);
 
 export default internRoute;
