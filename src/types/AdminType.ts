@@ -10,13 +10,20 @@ export interface authAdminRequest extends Request {
     updatedAt: Date,
     deletedAt?: Date | null,
     role?: string | null,
-    // account: {
-    //   id: number,
-    //   password: string,
-    //   admin_id: number,
-    //   createdAt: Date,
-    //   updatedAt: Date,
-    //   deletedAt: Date
-    // }
   } | undefined
 }
+
+export type baseAdminType = {
+  firstname: string;
+  lastname: string;
+  email: string;
+};
+
+export type adminAccountType = baseAdminType & {
+  id?: number
+  password: string
+};
+
+export type adminType = baseAdminType & {
+  id?: number
+};

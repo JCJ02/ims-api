@@ -78,13 +78,13 @@ class RoleRepo {
             },
             orderBy: {
                 createdAt: 'desc'
-            },
+            }
         });
 
         const totalRoles = await prisma.role.count({
             where: {
-                deletedAt: null,
-            },
+                deletedAt: null
+            }
         });
 
         return {

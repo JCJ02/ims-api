@@ -151,7 +151,7 @@ class RoleController {
                 res,
                 data: paginatedRoles,
                 message: "List Of Roles!",
-                code: 201,
+                code: 200,
             });
 
         } catch (error: any) {
@@ -175,8 +175,8 @@ class RoleController {
             return AppResponse.sendSuccessful({
                 res,
                 data: searchResults,
-                message: "Search Sucessfully!",
-                code: 201
+                message: "Result!",
+                code: 200
             })
             
         } catch (error: any) {

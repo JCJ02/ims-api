@@ -1,9 +1,10 @@
+import { adminAccountType, adminType } from "../types/AdminType";
 import prisma from "../utils/client";
 
 class AdminRepo {
 
     // CREATE ADMIN METHOD
-    async createAdmin(data: any) {
+    async createAdmin(data: adminAccountType) {
 
         const newAdmin = await prisma.$transaction(async (prisma) => {
             return await prisma.admin.create({
@@ -16,7 +17,7 @@ class AdminRepo {
                             password: data.password
                         }
                     }
-                },
+                }
             });
         });
 
@@ -24,8 +25,8 @@ class AdminRepo {
 
     }
 
-    // AUTHENTICATE OR LOGIN ADMIN METHOD
-    async authenticate(data: any) {
+    // AUTHENTICATE OR LOG IN ADMIN METHOD
+    async authenticate(data: { email: string }) {
         //console.log("Email: ", data.email);
         const admin = await prisma.admin.findFirst({
             where: {
@@ -59,11 +60,12 @@ class AdminRepo {
     }
 
     // UPDATE ADMIN METHOD
-    async updateAdmin(data: any) {
+    async updateAdmin(data: adminType) {
 
         const editAdmin = await prisma.admin.update({
             where: {
-                id: data.id
+                id: data.id,
+                deletedAt: null
             },
             data: {
                 firstname: data.firstname,
@@ -92,17 +94,135 @@ class AdminRepo {
 
     }
 
-    // GET ALL ADMIN DATA METHOD
-    async getAllAdmin(data: any) {
-        
-        const getAllAdmin = await prisma.admin.findMany({
+    // DELETE ADMIN METHOD
+    async deleteAdmin(id: number) {
+        const softDeleteAdmin = await prisma.admin.update({
             where: {
-                id: data.id,
+                id: id,
+                deletedAt: null,
+            },
+            data: {
+                deletedAt: new Date(),
+                account: {
+                    updateMany: {
+                        where: {
+                            adminId: id,
+                            deletedAt: null
+                        },
+                        data: {
+                            deletedAt: new Date()
+                        }
+                    }
+                }
+            },
+        });
+
+        return softDeleteAdmin;
+    }
+
+    // GET ADMINS w/ PAGINATION METHOD
+    async getAdmins(skip: number, limit: number) {
+
+        const admins = await prisma.admin.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: null
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        const totalAdmins = await prisma.admin.count({
+            where: {
                 deletedAt: null
             }
         });
 
-        return getAllAdmin;
+        return {
+            admins,
+            totalAdmins
+        }
+
+    }
+
+    // SEARCH ADMINS w/ PAGINATION METHOD
+    async searchAdmins(query: string, skip: number, limit: number) {
+        
+        const admins = await prisma.admin.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: null,
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalAdmins = await prisma.admin.count({
+            where: {
+                deletedAt: null,
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    } 
+                ]
+            }
+        });
+
+        return {
+            admins,
+            totalAdmins
+        }
 
     }
 

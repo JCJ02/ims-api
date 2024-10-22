@@ -3,18 +3,20 @@ import AppResponse from "../utils/AppResponse";
 import { verifyToken } from "../utils/token";
 import { JsonWebTokenError } from "jsonwebtoken";
 import AdminService from "../services/AdminService";
-import { authAdminRequest } from "../types/AdminType";
+import InternService from "../services/InternService";
+import { authMiddlewareRequest } from "../types/AuthMiddlewareType";
 
-const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: NextFunction) => {
+const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: NextFunction) => {
     
     try {
 
         const adminService = new AdminService();
+        const internService = new InternService();
 
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return AppResponse.sendErrors({
+            return AppResponse.sendErrors({ 
                 res,
                 data: null,
                 message: "No Token Provided!",
@@ -24,7 +26,41 @@ const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: N
 
         const verifiedToken = verifyToken(token) as any;
         //console.log(verifiedToken);
-        if(verifiedToken.role !== "Admin") {
+        if(verifiedToken.role === "Admin") {
+
+            const admin = await adminService.show(verifiedToken.id);
+            //console.log(admin);
+            if(!admin) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin Not Found!",
+                    code: 403
+                });
+            } else {
+                req.user = admin;
+
+                next();
+            }
+
+        } else if(verifiedToken.role !== "Admin") {
+
+            const intern = await internService.show(verifiedToken.id);
+
+            if(!intern) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Intern Not Found!",
+                    code: 403
+                });
+            } else {
+                req.user = intern;
+
+                next();
+            }
+
+        } else {
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -32,21 +68,6 @@ const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: N
                 code: 403
             });
         }
-        
-        const admin = await adminService.show(verifiedToken.id);
-        //console.log(admin);
-        if(!admin) {
-            return AppResponse.sendErrors({
-                res,
-                data: null,
-                message: "Admin Not Found!",
-                code: 403
-            });
-        }
-
-        req.admin = admin;
-
-        next();
 
     } catch (error: any) {
 
@@ -71,4 +92,4 @@ const authAdminMiddleware = async (req: authAdminRequest, res: Response, next: N
 
 }
 
-export default authAdminMiddleware;
+export default authMiddleware;

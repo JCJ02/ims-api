@@ -25,14 +25,42 @@ model Admin {
   account   Account[]
 }
 
+model Intern {
+  id        Int       @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String
+  birthdate DateTime
+  school    String
+  mentor    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  role      String
+  account   Account[]
+}
+
+model Mentor {
+  id        Int       @id @default(autoincrement())
+  firstname String
+  lastname  String
+  email     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  role      String
+}
+
 model Account {
   id        Int       @id @default(autoincrement())
   password  String
   adminId   Int?
+  internId  Int?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
   deletedAt DateTime?
   admin     Admin?    @relation(fields: [adminId], references: [id])
+  inter     Intern?   @relation(fields: [internId], references: [id])
 }
 
 model Role {

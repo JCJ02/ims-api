@@ -1,35 +1,68 @@
 import { Request, Response } from "express";
 import AppResponse from "../utils/AppResponse";
-// import TestService from "../services/TestService";
 import AdminService from "../services/AdminService";
 import { adminSchema, authAdminSchema, updateAdminSchema, updateAdminPasswordSchema } from "../utils/validations/AdminSchema";
-import { authAdminRequest } from "../types/AdminType";
+import { sendingEmailSchema } from "../utils/validations/EmailSchema";
+import { authMiddlewareRequest } from "../types/AuthMiddlewareType";
+import TestService from "../services/TestService";
 
 class AdminController {
 
-    //private testService;
     private adminService;
+    private testService;
 
     constructor() {
 
-        // this.testService = new TestService();
         this.adminService = new AdminService();
+        this.testService = new TestService();
 
+        this.test = this.test.bind(this);
         this.index = this.index.bind(this);
         this.createAdmin = this.createAdmin.bind(this);
         this.authenticate = this.authenticate.bind(this);
         this.updateAdmin = this.updateAdmin.bind(this);
         this.updateAdminPassword = this.updateAdminPassword.bind(this);
         this.getAllAdmin = this.getAllAdmin.bind(this);
-        this.deleteAdmin = this.deleteAdmin.bind(this);
 
     }
 
-    async index(req: authAdminRequest, res: Response) {
+    // TEST
+    async test(req: Request, res: Response) {
+        try {
+            
+            const result = await this.testService.index(req.body);
+
+            if(!result) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Testing!",
+                    code: 400
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: result,
+                    message: "Tested Successfully!!",
+                    code: 400
+                });
+            }
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            })
+        }
+    }
+
+    async index(req: authMiddlewareRequest, res: Response) {
 
         try {
 
-            const admin = req.admin;
+            const admin = req.user;
             //console.log(admin);
             if(!admin) {
                 return AppResponse.sendErrors({
@@ -135,14 +168,14 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Invalid Login Credentials!",  
+                    message: "Invalid Log In Credentials!",  
                     code: 401
                 });
             } else {
                 return AppResponse.sendSuccessful({
                     res,
                     data: result,
-                    message: "Login Successful!",
+                    message: "Log In Successful!",
                     code: 200
                 });
             }
@@ -163,6 +196,8 @@ class AdminController {
 
         try {
 
+            const adminId = req;
+
             const validateAdminData = updateAdminSchema.safeParse(req.body);
             // console.log(validateAdminData);
             if(validateAdminData.error) {
@@ -174,7 +209,7 @@ class AdminController {
                 });
             } else {
 
-                const admin = await this.adminService.updateAdmin(req, validateAdminData.data);
+                const admin = await this.adminService.updateAdmin(adminId, validateAdminData.data);
                 // console.log(admin);
 
                 if(!admin) {
@@ -241,7 +276,7 @@ class AdminController {
                     res,
                     data: null,
                     message: "Successfully Updated Password!",
-                    code: 201
+                    code: 200
                 });
             }
 
@@ -256,14 +291,13 @@ class AdminController {
 
     }
 
-    // GET ALL ADMIN METHOD
-    async getAllAdmin(req: Request, res: Response) {
-
+    // DELETE ADMIN METHOD
+    async deleteAdmin(req: Request, res: Response) {
         try {
             
-            const validation = await this.adminService.getAllAdmin(req.body);
-
-            if(!validation) {
+            const adminId = Number(req.params.id);
+            // console.log(ID: ${id});
+            if(!adminId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -271,13 +305,75 @@ class AdminController {
                     code: 404
                 });
             } else {
+                const isAdminDeleted = await this.adminService.deleteAdmin(adminId);
+                // console.log(Admin Existence: ${isAdminDeleted});
+                if(!isAdminDeleted) {
+                    return AppResponse.sendErrors({
+                        res,
+                        data: null,
+                        message: "Failed To Delete!",
+                        code: 403
+                    });
+                } else {
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: { "Deleted At": isAdminDeleted.deletedAt },
+                        message: "Successfully Deleted!",
+                        code: 200
+                    });
+                }
+            }
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+    }
+
+    // SENDING E-MAILS METHOD
+    async sendEmail(req: Request, res: Response) {
+        try {
+            
+            const validateEmail = sendingEmailSchema.safeParse(req.body);
+
+            if(validateEmail.error) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: validateEmail.error.errors[0].message,
+                    code: 403
+                });
+            }
+
+            // const sentEmail = await this.adminService.sendEmail(validateEmail.data);
+
+            const sentEmail = await this.adminService.sendEmail({
+                email: validateEmail.data.to,  
+                subject: validateEmail.data.subject,
+                message: validateEmail.data.message
+            });
+
+            // console.log(`To: ${validateEmail.data.to}`);
+            // console.log(`Subject: ${validateEmail.data.subject}`);
+            // console.log(`Message: ${validateEmail.data.message}`);
+
+            if (!sentEmail) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Failed To Send Email!",
+                    code: 500
+                });
+            } else {
                 return AppResponse.sendSuccessful({
                     res,
-                    data: {
-                        admin: validation
-                    },
-                    message: "List Of Admin!",
-                    code: 404
+                    data: sentEmail,
+                    message: "Sent Email Successfully!",
+                    code: 201
                 });
             }
 
@@ -288,6 +384,59 @@ class AdminController {
                 message: error.message,
                 code: 500
             });
+        }
+    }
+
+    // GET ADMINS w/ PAGINATION METHOD
+    async getAdmins(req: Request, res: Response) {
+
+        try {
+
+            const paginatedAdmins = await this.adminService.getAdmins(req);
+
+            return AppResponse.sendSuccessful({
+                res,
+                data: paginatedAdmins,
+                message: "List of Admins!",
+                code: 200
+            });
+            
+        } catch (error: any) {
+            
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+
+        }
+
+    }
+
+    // SEARCH ADMINS w/ PAGINATION METHOD
+    async searchAdmins(req: Request, res: Response) {
+        
+        try {
+
+            const searchResults = await this.adminService.searchAdmins(req);
+
+            return AppResponse.sendSuccessful({
+                res,
+                data: searchResults,
+                message: "Result!",
+                code: 200
+            });
+            
+        } catch (error: any) {
+            
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+
         }
 
     }

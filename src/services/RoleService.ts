@@ -25,11 +25,11 @@ class RoleService {
 
             const incrementedNumber = (lastNumber + 1).toString().padStart(4, '0');
 
-            newRoleId = `INT-${incrementedNumber}`;
+            newRoleId = `LWS-${incrementedNumber}`;
 
         } else {
 
-            newRoleId = 'INT-0001';
+            newRoleId = 'LWS-0001';
         }
 
         const roleData = {
@@ -85,7 +85,7 @@ class RoleService {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
-        const query = req.query.query as string || '';
+        const query = req.query.query as string || "";
 
         const skip = (page - 1) * limit;
 
