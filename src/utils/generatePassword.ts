@@ -1,6 +1,7 @@
 import crypto from "crypto";
 
 export const generatePassword = async(length: number = 10): Promise<string> => {
+    
     const numbers = "0123456789";
     const specialChars = "!@#$%^&*()_+{}[]";
     const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -20,6 +21,7 @@ export const generatePassword = async(length: number = 10): Promise<string> => {
 
     // SHUFFLE THE PASSWORD TO MIX THE REQUIRED CHARACTERS WITH THE RANDOM ONES
     return password.split('').sort(() => 0.5 - Math.random()).join('');
+
 }
 
 
