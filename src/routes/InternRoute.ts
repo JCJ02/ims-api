@@ -1,8 +1,6 @@
 import express from "express";
 import InternController from "../controllers/InternController";
-import authAdminMiddleware from "../middlewares/AuthAdminMiddleware";
 import authMiddleware from "../middlewares/AuthMiddleware";
-import RoleController from "../controllers/RoleController";
 
 const internRoute = express.Router();
 const internController = new InternController();
