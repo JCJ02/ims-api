@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon src/server.ts",
     "seed": "ts-node src/seed.ts",
-    "generateKey": "ts-node src/utils/generateKey.ts"
+    "generateRandomKey": "ts-node src/utils/generateRandomKey.ts"
   },
   "keywords": [],
   "author": "",
