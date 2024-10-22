@@ -5,6 +5,7 @@ import { Request } from "express";
 import { generateToken } from "../utils/token";
 import { sendEmails } from "../utils/sendEmails";
 import prisma from "../utils/client";
+import { generatePassword } from "../utils/generatePassword";
 
 class InternService {
 
@@ -19,6 +20,7 @@ class InternService {
     // CREATE INTERN
     async createIntern(data: internAccountType) {
 
+        // const plainPassword = data.password;
         const plainPassword = data.password;
         const hashedPassword = bcrypt.hashSync(plainPassword, 10);
 
@@ -41,7 +43,7 @@ class InternService {
                     to: newIntern.email,
                     subject: `Welcome to the Team, ${newIntern.firstname} ${newIntern.lastname}! Your Intern Account is Ready! 🎉`,
                     message: `
-                        Hello ${newIntern.firstname} ${newIntern.lastname}! <br>
+                        Hello, <b>${newIntern.firstname} ${newIntern.lastname}</b>! <br>
                         <br>
                         Fantastic news, your <b>Intern Account</b> has been successfully created! <br>
                         <br>
@@ -193,6 +195,52 @@ class InternService {
         const searchInterns = await this.internRepo.searchInterns(query, skip, limit);
 
         return searchInterns;
+
+    }
+
+    // RESET PASSWORD METHOD
+    async resetInternPassword(id: number) {
+
+        const intern = await this.internRepo.show(id);
+
+        if(!intern) {
+            return null;
+        } else {
+
+            const newGeneratedPassword = await generatePassword(10);
+            const hashedNewPassword = bcrypt.hashSync(newGeneratedPassword, 10);
+
+            const updatedPassword = await this.internRepo.updateInternPassword(intern.account[0].id, { newPassword: hashedNewPassword });
+
+            if(updatedPassword) {
+
+                const sendUpdatedPassword = await sendEmails({
+                    to: intern.email,
+                    subject: "🎉 Your Password Has Been Reset! 🚀",
+                    message: `
+                        Hello, <b>${intern.firstname} ${intern.lastname}</b>! 🌟 <br>
+                        <br>
+                        Your Password has been successfully reset. <br>
+                        Here is your new password to get you back on track: <br>
+                        <br>
+                        <b>New Password: </b> ${newGeneratedPassword} <br>
+                        <br>
+                        Don’t forget to change your password after logging in for the first time to keep your account secure! 🔒 <br>
+                        <br>
+                        We're thrilled to have you on board, and we can't wait to see all the amazing things you'll achieve! Let's make great things happen! 💪 <br>
+                        <br>
+                        Best regards, <br>
+                        The Lightweight Solutions Team! 🎯<br>
+                    `
+                });
+
+                return sendUpdatedPassword;
+
+            }
+
+            return updatedPassword;
+
+        }
 
     }
 

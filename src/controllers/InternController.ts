@@ -21,6 +21,7 @@ class InternController {
         this.deleteIntern = this.deleteIntern.bind(this);
         this.getInterns = this.getInterns.bind(this);
         this.searchInterns = this.searchInterns.bind(this);
+        this.resetInternPassword = this.resetInternPassword.bind(this);
 
     }
 
@@ -265,7 +266,7 @@ class InternController {
                     res,
                     data: null,
                     message: "Intern Not Found!",
-                    code: 404
+                    code: 400
                 });
             } else {
                 const isInternDeleted = await this.internService.deleteIntern(internId);
@@ -339,6 +340,44 @@ class InternController {
                 code: 200
             });
 
+        } catch (error: any) {
+            
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+
+        }
+
+    }
+
+    // RESET PASSWORD METHOD
+    async resetInternPassword(req: Request, res: Response) {
+
+        try {
+
+            const internId = Number(req.params.id);
+
+            const isPasswordUpdated = await this.internService.resetInternPassword(internId);
+
+            if(!isPasswordUpdated) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Incorrect Credentials!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: null,
+                    message: "Reset Password Successfully!",
+                    code: 200
+                });
+            }
+            
         } catch (error: any) {
             
             return AppResponse.sendErrors({
