@@ -9,7 +9,6 @@ const sendingEmailSchema = z.object({
     message: z.string({
         required_error: "Message Is Required!"
     })
-        .max(255, "Message Must Not Exceed 255 Characters!"),
 });
 
 export {
