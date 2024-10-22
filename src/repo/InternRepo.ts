@@ -1,6 +1,5 @@
 import prisma from "../utils/client";
 import { internAccountType, internType } from "../types/InternType";
-import { sendEmails } from "../utils/sendEmails";
 
 class InternRepo {
 
@@ -314,6 +313,22 @@ class InternRepo {
             interns,
             totalInterns
         }
+
+    }
+
+    // RESET PASSWORD METHOD
+    async resetInternPassword(id: number, data: { newPassword: string }) {
+        
+        const newInternPassword = await prisma.account.update({
+            where: {
+                id: id
+            },
+            data: {
+                password: data.newPassword
+            }
+        });
+
+        return newInternPassword;
 
     }
 
