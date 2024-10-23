@@ -119,11 +119,11 @@ class InternRepo {
     }
 
     // UPDATE INTERN METHOD
-    async updateIntern(data: internType) {
+    async updateIntern(id: number, data: internType) {
         
         const editIntern = await prisma.intern.update({
             where: {
-                id: data.id,
+                id: id,
                 deletedAt: null
             },
             data: {

@@ -29,10 +29,6 @@ class InternService {
             password: hashedPassword
         }
 
-        // const newIntern = await this.internRepo.createIntern(internData);
-
-        // return newIntern;
-
         const createdIntern = await prisma.$transaction( async (prismaTrasaction) => {
 
             const newIntern = await this.internRepo.createIntern(internData, prismaTrasaction);
@@ -112,16 +108,23 @@ class InternService {
     }
 
     // UPDATE INTERN METHOD
-    async updateIntern(req: Request, data: internType) {
+    async updateIntern(id: number, data: internType) {
 
-        const internId = Number(req.params.id);
+        const intern = await this.internRepo.show(id);
 
-        const internData = {
-            id: internId,
-            ...data
+        if(!intern) {
+            return null;
+        } else {
+
+            const internData = {
+                ...data
+            }
+
+            const updateInternData = this.internRepo.updateIntern(intern.id, internData);
+
+            return updateInternData;
+
         }
-
-        return await this.internRepo.updateIntern(internData);
 
     }
 
