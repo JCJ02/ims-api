@@ -199,41 +199,40 @@ class AdminController {
 
         try {
 
-            const adminId = req;
+            const adminId = Number(req.params.id);
 
             const validateAdminData = updateAdminSchema.safeParse(req.body);
-            // console.log(validateAdminData);
-            if(validateAdminData.error) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: validateAdminData.error.errors[0].message,
-                    code: 400
-                });
-            } else {
 
-                const admin = await this.adminService.updateAdmin(adminId, validateAdminData.data);
-                // console.log(admin);
-
-                if(!admin) {
+                if(validateAdminData.error) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
-                        message: "Failed To Update!",
+                        message: validateAdminData.error.errors[0].message,
                         code: 403
                     });
                 } else {
-                    return AppResponse.sendSuccessful({
-                        res,
-                        data: {
-                            admin: admin
-                        },
-                        message: "Successfully Updated!",
-                        code: 201
-                    });
+
+                    const updatedAdminData = await this.adminService.updateAdmin(adminId, validateAdminData.data);
+
+                    if(!updatedAdminData) {
+                        return AppResponse.sendErrors({
+                            res,
+                            data: null,
+                            message: "Failed To Update!",
+                            code: 403
+                        });
+                    } else {
+                            return AppResponse.sendSuccessful({
+                            res,
+                            data: { admin:  updatedAdminData },
+                            message: "Successfully Updated!",
+                            code: 201
+                        });
+                    }
+
                 }
-                
-            }
+
+            
             
         } catch (error: any) {
             return AppResponse.sendErrors({

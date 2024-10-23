@@ -61,18 +61,28 @@ class AdminService {
     }
 
     // UPDATE ADMIN METHOD
-    async updateAdmin(req: Request, data: any) {
+    async updateAdmin(id: number, data: adminType) {
 
-        const id = Number(req.params.id);
+        const admin = await this.adminRepo.show(id);
+        console.log(`Admin ID: ${admin}`);
 
-        const adminData = {
-            id: id,
-            ...data
+        if(!admin) {
+            return null;
+        } else {
+
+            const adminData = {
+                ...data
+            }
+
+            const updateAdminData = await this.adminRepo.updateAdmin(admin.id, adminData);
+            console.log(`Update Admin Data: ${updateAdminData}`);
+
+            return updateAdminData;
+
         }
 
-        return await this.adminRepo.updateAdmin(adminData);
-
     }
+    
     // UPDATE ADMIN PASSWORD METHOD
     async updateAdminPassword(id: number, data: { currentPassword: string, newPassword: string } ) {
 

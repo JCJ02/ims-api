@@ -60,11 +60,11 @@ class AdminRepo {
     }
 
     // UPDATE ADMIN METHOD
-    async updateAdmin(data: adminType) {
+    async updateAdmin(id: number, data: adminType) {
 
         const editAdmin = await prisma.admin.update({
             where: {
-                id: data.id,
+                id: id,
                 deletedAt: null
             },
             data: {
