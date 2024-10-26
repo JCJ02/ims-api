@@ -29,7 +29,7 @@ class AdminController {
 
     }
 
-    // TEST
+    // TEST API
     async test(req: Request, res: Response) {
         try {
             
@@ -39,15 +39,15 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Testing!",
-                    code: 400
+                    message: "API Testing Failed!",
+                    code: 403
                 });
             } else {
                 return AppResponse.sendSuccessful({
                     res,
                     data: result,
-                    message: "Tested Successfully!!",
-                    code: 400
+                    message: "API Tested Successfully!!",
+                    code: 200
                 });
             }
 
