@@ -24,7 +24,7 @@ class AdminController {
         this.updateAdminPassword = this.updateAdminPassword.bind(this);
         this.deleteAdmin = this.deleteAdmin.bind(this);
         this.sendEmail = this.sendEmail.bind(this);
-        this.getAdminsList = this.getAdminsList.bind(this);
+        this.getAdmins = this.getAdmins.bind(this);
         this.searchAdmins = this.searchAdmins.bind(this);
 
     }
@@ -441,6 +441,49 @@ class AdminController {
 
         }
 
+    }
+
+    // DELETE ADMIN METHOD
+    async deleteAdmin(req: Request, res: Response) {
+        try {
+            
+            const id = Number(req.params.id);
+            // console.log(`ID: ${id}`);
+            if(!id) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin Not Found!",
+                    code: 404
+                });
+            } else {
+                const isAdminDeleted = await this.adminService.deleteAdmin(id);
+                // console.log(`Admin Existence: ${isAdminDeleted}`);
+                if(!isAdminDeleted) {
+                    return AppResponse.sendErrors({
+                        res,
+                        data: null,
+                        message: "Failed To Delete!",
+                        code: 403
+                    });
+                } else {
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: { "Deleted At": isAdminDeleted.deletedAt },
+                        message: "Successfully Deleted!",
+                        code: 200
+                    });
+                }
+            }
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
     }
 
 }

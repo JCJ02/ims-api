@@ -8,7 +8,7 @@ type appResponseParams = {
 }
 
 class AppResponse {
-    static sendSuccessful({res, message, data, code}: appResponseParams): void {
+    static sendSuccessful({ res, message, data, code }: appResponseParams): void {
         res.status(code).json({
             message,
             data,
@@ -16,14 +16,14 @@ class AppResponse {
         });
     }
 
-    static sendErrors({res, message, data, code}: appResponseParams): void {
+    static sendErrors({ res, message, data, code }: appResponseParams): void {
 
         let returnMessage;
 
-        if(code !== 500) {
+        if (code !== 500) {
             returnMessage = message;
         } else {
-            if(process.env.ENV == "development") {
+            if (process.env.ENV == "development") {
                 returnMessage = message;
             } else {
                 returnMessage = "Internal Server Error!";
