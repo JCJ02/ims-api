@@ -10,8 +10,8 @@ type appResponseParams = {
 class AppResponse {
     static sendSuccessful({ res, message, data, code }: appResponseParams): void {
         res.status(code).json({
-            message,
             data,
+            message,
             code
         });
     }
@@ -31,8 +31,8 @@ class AppResponse {
         }
 
         res.status(code).json({
-            message: returnMessage,
             data,
+            message: returnMessage,
             code
         });
     }
