@@ -13,7 +13,7 @@ class AppResponse {
             message,
             data,
             code
-        })
+        });
     }
 
     static sendErrors({res, message, data, code}: appResponseParams): void {
@@ -34,7 +34,7 @@ class AppResponse {
             message: returnMessage,
             data,
             code
-        })
+        });
     }
 }
 
