@@ -180,7 +180,7 @@ class InternService {
 
         const skip = (page - 1) * limit;
 
-        const paginatedInterns = await this.internRepo.getInterns(skip, limit);
+        const paginatedInterns = await this.internRepo.getInternsList(skip, limit);
 
         return paginatedInterns;
 

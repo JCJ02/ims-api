@@ -186,7 +186,7 @@ class InternRepo {
     }
 
     // INTERN LIST w/ PAGINATION METHOD
-    async getInterns(skip: number, limit: number) {
+    async getInternsList(skip: number, limit: number) {
 
         const interns = await prisma.intern.findMany({
             skip: skip,

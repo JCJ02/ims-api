@@ -19,7 +19,7 @@ class InternController {
         this.updateInternPassword = this.updateInternPassword.bind(this);
         this.authenticate = this.authenticate.bind(this);
         this.deleteIntern = this.deleteIntern.bind(this);
-        this.getInterns = this.getInterns.bind(this);
+        this.getInternsList = this.getInternsList.bind(this);
         this.searchInterns = this.searchInterns.bind(this);
         this.resetInternPassword = this.resetInternPassword.bind(this);
 
@@ -311,7 +311,7 @@ class InternController {
     }
 
     // GET INTERNS w/ PAGINATION METHOD
-    async getInterns(req: Request, res: Response) {
+    async getInternsList(req: Request, res: Response) {
 
         try {
             
