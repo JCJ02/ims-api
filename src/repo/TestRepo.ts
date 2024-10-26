@@ -1,4 +1,3 @@
-
 class TestRepo {
 
     async index(data: { message: string }){
