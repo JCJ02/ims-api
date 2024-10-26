@@ -120,8 +120,8 @@ class AdminRepo {
         return softDeleteAdmin;
     }
 
-    // GET ADMINS w/ PAGINATION METHOD
-    async getAdmins(skip: number, limit: number) {
+    // GET ADMINS LIST w/ PAGINATION METHOD
+    async getAdminsList(skip: number, limit: number) {
 
         const admins = await prisma.admin.findMany({
             skip: skip,

@@ -135,15 +135,15 @@ class AdminService {
 
     }
 
-    // GET ADMINS w/ PAGINATION METHOD
-    async getAdmins(req: Request) {
+    // GET ADMINS LIST w/ PAGINATION METHOD
+    async getAdminsList(req: Request) {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
 
         const skip = (page - 1) * limit;
 
-        const paginatedAdmins = await this.adminRepo.getAdmins(skip, limit);
+        const paginatedAdmins = await this.adminRepo.getAdminsList(skip, limit);
 
         return paginatedAdmins;
 

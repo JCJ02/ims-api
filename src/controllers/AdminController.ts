@@ -24,7 +24,7 @@ class AdminController {
         this.updateAdminPassword = this.updateAdminPassword.bind(this);
         this.deleteAdmin = this.deleteAdmin.bind(this);
         this.sendEmail = this.sendEmail.bind(this);
-        this.getAdmins = this.getAdmins.bind(this);
+        this.getAdminsList = this.getAdminsList.bind(this);
         this.searchAdmins = this.searchAdmins.bind(this);
 
     }
@@ -389,12 +389,12 @@ class AdminController {
         }
     }
 
-    // GET ADMINS w/ PAGINATION METHOD
-    async getAdmins(req: Request, res: Response) {
+    // GET ADMINS LIST w/ PAGINATION METHOD
+    async getAdminsList(req: Request, res: Response) {
 
         try {
 
-            const paginatedAdmins = await this.adminService.getAdmins(req);
+            const paginatedAdmins = await this.adminService.getAdminsList(req);
 
             return AppResponse.sendSuccessful({
                 res,
