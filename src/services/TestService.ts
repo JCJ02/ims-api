@@ -9,7 +9,7 @@ class TestService {
     }
 
     async index(data: { message: string }){
-        return this.testRepo.index(data);
+        return await this.testRepo.index(data);
     }
 
 }

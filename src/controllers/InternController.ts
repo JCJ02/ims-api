@@ -19,7 +19,7 @@ class InternController {
         this.updateInternPassword = this.updateInternPassword.bind(this);
         this.authenticate = this.authenticate.bind(this);
         this.deleteIntern = this.deleteIntern.bind(this);
-        this.getInterns = this.getInterns.bind(this);
+        this.getInternsList = this.getInternsList.bind(this);
         this.searchInterns = this.searchInterns.bind(this);
         this.resetInternPassword = this.resetInternPassword.bind(this);
 
@@ -158,8 +158,6 @@ class InternController {
         
         try {
 
-            const internId = req;
-
             const validateInternData = updateInternSchema.safeParse(req.body);
 
             if(validateInternData.error) {
@@ -170,25 +168,38 @@ class InternController {
                     code: 403
                 });
             } else {
-                //console.log("Validated data:", validateInternData.data);
-                const updatedIntern = await this.internService.updateIntern(internId, validateInternData.data);
 
-                if(!updatedIntern) {
+                const internId = Number(req.params.id);
+
+                if(!internId) {
                     return AppResponse.sendErrors({
-                       res,
-                       data: null,
-                       message: "Failed To Update!!!",
-                       code: 403 
+                        res,
+                        data: null,
+                        message: "Intern Not Found!",
+                        code: 403
                     });
                 } else {
-                    return AppResponse.sendSuccessful({
-                        res,
-                        data: {
-                            intern: updatedIntern
-                        },
-                        message: "Successfully Updated!",
-                        code: 201
-                    });
+
+                    const updateInternData = await this.internService.updateIntern(internId, validateInternData.data);
+
+                    if(!updateInternData) {
+                        return AppResponse.sendErrors({
+                            res,
+                            data: null,
+                            message: "Failed To Update!",
+                            code: 403
+                        });
+                    } else {
+                        return AppResponse.sendSuccessful({
+                            res,
+                            data: {
+                                intern: updateInternData
+                            },
+                            message: "Successfully Updated!",
+                            code: 201
+                        });
+                    }
+
                 }
 
             }
@@ -300,7 +311,7 @@ class InternController {
     }
 
     // GET INTERNS w/ PAGINATION METHOD
-    async getInterns(req: Request, res: Response) {
+    async getInternsList(req: Request, res: Response) {
 
         try {
             

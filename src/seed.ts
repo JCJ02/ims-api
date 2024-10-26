@@ -39,8 +39,12 @@ async function createAdmin() {
 
 
 createAdmin()
-    .catch(error => {
+    .then(async () =>{
+        await prisma.$disconnect();
+    })
+    .catch(async (error) => {
         console.error("Error In Admin User Creation: ", error);
+        await prisma.$disconnect();
         process.exit(1);
     });
 
