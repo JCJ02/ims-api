@@ -82,8 +82,8 @@ class AdminRepo {
     async updateAdminPassword(id: number, data: { newPassword: string }) {
 
         const editAdminPassword = await prisma.account.update({
-            where: { 
-                id: id, 
+            where: {
+                id: id,
             },
             data: {
                 password: data.newPassword
@@ -120,8 +120,8 @@ class AdminRepo {
         return softDeleteAdmin;
     }
 
-    // GET ADMINS w/ PAGINATION METHOD
-    async getAdmins(skip: number, limit: number) {
+    // GET ADMINS LIST w/ PAGINATION METHOD
+    async getAdminsList(skip: number, limit: number) {
 
         const admins = await prisma.admin.findMany({
             skip: skip,
@@ -149,7 +149,7 @@ class AdminRepo {
 
     // SEARCH ADMINS w/ PAGINATION METHOD
     async searchAdmins(query: string, skip: number, limit: number) {
-        
+
         const admins = await prisma.admin.findMany({
             skip: skip,
             take: limit,
@@ -214,7 +214,7 @@ class AdminRepo {
                             contains: query,
                             mode: "insensitive"
                         }
-                    } 
+                    }
                 ]
             }
         });

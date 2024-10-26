@@ -22,17 +22,20 @@ class AdminController {
         this.authenticate = this.authenticate.bind(this);
         this.updateAdmin = this.updateAdmin.bind(this);
         this.updateAdminPassword = this.updateAdminPassword.bind(this);
-        this.getAllAdmin = this.getAllAdmin.bind(this);
+        this.deleteAdmin = this.deleteAdmin.bind(this);
+        this.sendEmail = this.sendEmail.bind(this);
+        this.getAdminsList = this.getAdminsList.bind(this);
+        this.searchAdmins = this.searchAdmins.bind(this);
 
     }
 
     // TEST
     async test(req: Request, res: Response) {
         try {
-            
+
             const result = await this.testService.index(req.body);
 
-            if(!result) {
+            if (!result) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -64,7 +67,7 @@ class AdminController {
 
             const admin = req.user;
             //console.log(admin);
-            if(!admin) {
+            if (!admin) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -94,7 +97,7 @@ class AdminController {
                 message: error.message,
                 code: 500
             });
-            
+
         }
 
     }
@@ -106,7 +109,7 @@ class AdminController {
 
             const validateAdminData = adminSchema.safeParse(req.body);
 
-            if(validateAdminData.error) {
+            if (validateAdminData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -117,7 +120,7 @@ class AdminController {
 
             const newAdmin = await this.adminService.createAdmin(validateAdminData.data);
 
-            if(!newAdmin) {
+            if (!newAdmin) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -134,7 +137,7 @@ class AdminController {
                     code: 201
                 });
             }
-    
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -153,7 +156,7 @@ class AdminController {
             //console.log("Raw request body: ", req.body);
             const validation = authAdminSchema.safeParse(req.body);
 
-            if(validation.error) {
+            if (validation.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -168,7 +171,7 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Invalid Log In Credentials!",  
+                    message: "Invalid Log In Credentials!",
                     code: 401
                 });
             } else {
@@ -188,7 +191,7 @@ class AdminController {
                 code: 500
             });
         }
-        
+
     }
 
     // UPDATE ADMIN METHOD
@@ -200,7 +203,7 @@ class AdminController {
 
             const validateAdminData = updateAdminSchema.safeParse(req.body);
             // console.log(validateAdminData);
-            if(validateAdminData.error) {
+            if (validateAdminData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -212,7 +215,7 @@ class AdminController {
                 const admin = await this.adminService.updateAdmin(adminId, validateAdminData.data);
                 // console.log(admin);
 
-                if(!admin) {
+                if (!admin) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -229,9 +232,9 @@ class AdminController {
                         code: 201
                     });
                 }
-                
+
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -246,13 +249,13 @@ class AdminController {
     // ADMIN ADMIN PASSWORD METHOD
     async updateAdminPassword(req: Request, res: Response) {
 
-        try {       
+        try {
 
             const adminId = Number(req.params.id);
 
             const validatePasswords = updateAdminPasswordSchema.safeParse(req.body);
 
-            if(validatePasswords.error) {
+            if (validatePasswords.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -264,7 +267,7 @@ class AdminController {
 
             const updatedPassword = await this.adminService.updateAdminPassword(adminId, validatePasswords.data);
             //console.log("Updated Password: ", updatedPassword);
-            if(!updatedPassword) {
+            if (!updatedPassword) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -294,10 +297,10 @@ class AdminController {
     // DELETE ADMIN METHOD
     async deleteAdmin(req: Request, res: Response) {
         try {
-            
-            const adminId = Number(req.params.id);
-            // console.log(ID: ${id});
-            if(!adminId) {
+
+            const id = Number(req.params.id);
+            // console.log(`ID: ${id}`);
+            if (!id) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -305,9 +308,9 @@ class AdminController {
                     code: 404
                 });
             } else {
-                const isAdminDeleted = await this.adminService.deleteAdmin(adminId);
-                // console.log(Admin Existence: ${isAdminDeleted});
-                if(!isAdminDeleted) {
+                const isAdminDeleted = await this.adminService.deleteAdmin(id);
+                // console.log(`Admin Existence: ${isAdminDeleted}`);
+                if (!isAdminDeleted) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -337,10 +340,10 @@ class AdminController {
     // SENDING E-MAILS METHOD
     async sendEmail(req: Request, res: Response) {
         try {
-            
+
             const validateEmail = sendingEmailSchema.safeParse(req.body);
 
-            if(validateEmail.error) {
+            if (validateEmail.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -352,7 +355,7 @@ class AdminController {
             // const sentEmail = await this.adminService.sendEmail(validateEmail.data);
 
             const sentEmail = await this.adminService.sendEmail({
-                email: validateEmail.data.to,  
+                email: validateEmail.data.to,
                 subject: validateEmail.data.subject,
                 message: validateEmail.data.message
             });
@@ -387,12 +390,12 @@ class AdminController {
         }
     }
 
-    // GET ADMINS w/ PAGINATION METHOD
-    async getAdmins(req: Request, res: Response) {
+    // GET ADMINS LIST w/ PAGINATION METHOD
+    async getAdminsList(req: Request, res: Response) {
 
         try {
 
-            const paginatedAdmins = await this.adminService.getAdmins(req);
+            const paginatedAdmins = await this.adminService.getAdminsList(req);
 
             return AppResponse.sendSuccessful({
                 res,
@@ -400,9 +403,9 @@ class AdminController {
                 message: "List of Admins!",
                 code: 200
             });
-            
+
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -416,7 +419,7 @@ class AdminController {
 
     // SEARCH ADMINS w/ PAGINATION METHOD
     async searchAdmins(req: Request, res: Response) {
-        
+
         try {
 
             const searchResults = await this.adminService.searchAdmins(req);
@@ -427,9 +430,9 @@ class AdminController {
                 message: "Result!",
                 code: 200
             });
-            
+
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -439,49 +442,6 @@ class AdminController {
 
         }
 
-    }
-
-    // DELETE ADMIN METHOD
-    async deleteAdmin(req: Request, res: Response) {
-        try {
-            
-            const id = Number(req.params.id);
-            // console.log(`ID: ${id}`);
-            if(!id) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: "Admin Not Found!",
-                    code: 404
-                });
-            } else {
-                const isAdminDeleted = await this.adminService.deleteAdmin(id);
-                // console.log(`Admin Existence: ${isAdminDeleted}`);
-                if(!isAdminDeleted) {
-                    return AppResponse.sendErrors({
-                        res,
-                        data: null,
-                        message: "Failed To Delete!",
-                        code: 403
-                    });
-                } else {
-                    return AppResponse.sendSuccessful({
-                        res,
-                        data: { "Deleted At": isAdminDeleted.deletedAt },
-                        message: "Successfully Deleted!",
-                        code: 200
-                    });
-                }
-            }
-
-        } catch (error: any) {
-            return AppResponse.sendErrors({
-                res,
-                data: null,
-                message: error.message,
-                code: 500
-            });
-        }
     }
 
 }
