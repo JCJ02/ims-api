@@ -46,7 +46,7 @@ class AdminController {
                 return AppResponse.sendSuccessful({
                     res,
                     data: result,
-                    message: "API Tested Successfully!!",
+                    message: "API Testing Successfully!!",
                     code: 200
                 });
             }
