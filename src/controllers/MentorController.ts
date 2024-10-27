@@ -14,6 +14,8 @@ class MentorController {
         this.createMentor = this.createMentor.bind(this);
         this.updateMentor = this.updateMentor.bind(this);
         this.deleteMentor = this.deleteMentor.bind(this);
+        this.getMentorsList = this.getMentorsList.bind(this);
+        this.searchMentors = this.searchMentors.bind(this);
 
     }
 
@@ -83,36 +85,25 @@ class MentorController {
                 });
             } else {
 
-                if(!mentorId) {
+                const updatedMentorData = await this.mentorService.updateMentor(mentorId, validatedMentorData.data);
+    
+                if(!updatedMentorData) {
+
                     return AppResponse.sendErrors({
                         res,
                         data: null,
-                        message: "Mentor Not Found!",
+                        message: "Failed To Update!",
                         code: 403
                     });
+
                 } else {
-    
-                    const updatedMentorData = await this.mentorService.updateMentor(mentorId, validatedMentorData.data);
-    
-                    if(!updatedMentorData) {
 
-                        return AppResponse.sendErrors({
-                            res,
-                            data: null,
-                            message: "Failed To Update!",
-                            code: 403
-                        });
-
-                    } else {
-
-                        return AppResponse.sendSuccessful({
-                            res,
-                            data: { mentor: updatedMentorData },
-                            message: "Successfully Updated!",
-                            code: 201
-                        });
-
-                    }
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: { mentor: updatedMentorData },
+                        message: "Successfully Updated!",
+                        code: 201
+                    });
 
                 }
 
@@ -165,6 +156,56 @@ class MentorController {
                 }
 
             }
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
+    // GET MENTORS LIST w/ PAGINATION METHOD
+    async getMentorsList(req: Request, res: Response) {
+
+        try {
+
+            const paginatedMentors = await this.mentorService.getMentorsList(req);
+
+            return AppResponse.sendSuccessful({
+                res,
+                data: paginatedMentors,
+                message: "List of Mentors!",
+                code: 200
+            });
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
+    // SEARCH MENTORS w/ PAGINATION METHOD
+    async searchMentors(req: Request, res: Response) {
+
+        try {
+        
+            const searchResults = await this.mentorService.searchMentors(req);
+
+            return AppResponse.sendSuccessful({
+                res,
+                data: searchResults,
+                message: "Result!",
+                code: 200
+            });
             
         } catch (error: any) {
             return AppResponse.sendErrors({

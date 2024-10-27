@@ -71,6 +71,112 @@ class MentorRepo {
 
     }
 
+    // GET MENTORS LIST w/ PAGINATION METHOD
+    async getMentorsList(skip: number, limit: number) {
+
+        const mentors = await prisma.mentor.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: null
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        const totalMentors = await prisma.mentor.count({
+            where: {
+                deletedAt: null
+            }
+        });
+
+        return {
+            mentors,
+            totalMentors
+        }
+
+    }
+
+    // SEARCH MENTORS w/ PAGINATION METHOD
+    async searchMentors(query: string, skip: number, limit: number) {
+
+        const mentors = await prisma.mentor.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: null,
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalMentors = await prisma.mentor.count({
+            where: {
+                deletedAt: null,
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
+
+        return {
+            mentors,
+            totalMentors
+        }
+
+    }
+
 }
 
 export default MentorRepo;

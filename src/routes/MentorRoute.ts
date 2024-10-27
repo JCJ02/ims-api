@@ -7,5 +7,7 @@ const mentorController = new MentorController();
 mentorRoute.post("/create", mentorController.createMentor);
 mentorRoute.put("/update/:id", mentorController.updateMentor);
 mentorRoute.put("/delete/:id", mentorController.deleteMentor);
+mentorRoute.get("/get-mentors", mentorController.getMentorsList);
+mentorRoute.get("/get-mentors/search", mentorController.searchMentors);
 
 export default mentorRoute;
