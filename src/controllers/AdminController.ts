@@ -29,7 +29,7 @@ class AdminController {
 
     }
 
-    // TEST
+    // TEST API
     async test(req: Request, res: Response) {
         try {
 
@@ -39,15 +39,15 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Testing!",
-                    code: 400
+                    message: "API Testing Failed!",
+                    code: 403
                 });
             } else {
                 return AppResponse.sendSuccessful({
                     res,
                     data: result,
-                    message: "Tested Successfully!!",
-                    code: 400
+                    message: "API Testing Successfully!!",
+                    code: 200
                 });
             }
 
@@ -199,7 +199,7 @@ class AdminController {
 
         try {
 
-            const adminId = req;
+            const adminId = Number(req.params.id);
 
             const validateAdminData = updateAdminSchema.safeParse(req.body);
             // console.log(validateAdminData);
@@ -212,8 +212,7 @@ class AdminController {
                 });
             } else {
 
-                const admin = await this.adminService.updateAdmin(adminId, validateAdminData.data);
-                // console.log(admin);
+                const updatedAdminData = await this.adminService.updateAdmin(adminId, validateAdminData.data);
 
                 if (!admin) {
                     return AppResponse.sendErrors({
