@@ -1,3 +1,4 @@
+import { Request } from "express";
 import MentorRepo from "../repo/MentorRepo";
 import { mentorType } from "../types/MentorType";
 
@@ -37,7 +38,7 @@ class MentorService {
                 ...data
             }
 
-            const updateMentorData = this.mentorRepo.updateMentor(mentor.id, mentorData);
+            const updateMentorData = await this.mentorRepo.updateMentor(mentor.id, mentorData);
 
             return updateMentorData;
 
@@ -59,6 +60,35 @@ class MentorService {
             return deleteMentor;
 
         }
+
+    }
+
+    // GET MENTORS LIST w/ PAGINATION METHOD
+    async getMentorsList(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+
+        const skip = (page - 1) * limit;
+
+        const paginatedMentors = await this.mentorRepo.getMentorsList(skip, limit);
+
+        return paginatedMentors;
+
+    }
+
+    // SEARCH MENTORS w/ PAGINATION METHOD
+    async searchMentors(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const query = req.query.query as string || "";
+
+        const skip = (page - 1) * limit;
+
+        const searchMentors = await this.mentorRepo.searchMentors(query, skip, limit);
+
+        return searchMentors;
 
     }
 
