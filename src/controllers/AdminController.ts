@@ -214,7 +214,7 @@ class AdminController {
 
                 const updatedAdminData = await this.adminService.updateAdmin(adminId, validateAdminData.data);
 
-                if (!admin) {
+                if (!updatedAdminData) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -225,7 +225,7 @@ class AdminController {
                     return AppResponse.sendSuccessful({
                         res,
                         data: {
-                            admin: admin
+                            admin: updatedAdminData
                         },
                         message: "Successfully Updated!",
                         code: 201
