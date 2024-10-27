@@ -2,7 +2,7 @@ import prisma from "./utils/client";
 import bcrypt from "bcryptjs";
 
 // CREATE ADMIN METHOD
-async function createAdmin() { 
+async function createAdmin() {
 
     try {
 
@@ -34,12 +34,11 @@ async function createAdmin() {
         await prisma.$disconnect();
 
     }
-    
+
 }
 
-
 createAdmin()
-    .then(async () =>{
+    .then(async () => {
         await prisma.$disconnect();
     })
     .catch(async (error) => {
