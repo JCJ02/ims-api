@@ -10,7 +10,6 @@ routes.use("/admin", adminRoute);
 routes.use("/role", roleRoute);
 routes.use("/mentor", mentorRoute);
 routes.use("/intern", internRoute);
-routes.use("/mentor", mentorRoute);
 
 export default routes;
 
