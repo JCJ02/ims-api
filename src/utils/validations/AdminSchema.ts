@@ -11,7 +11,7 @@ const adminSchema = z.object({
         required_error: "Lastname Is Required!",
         invalid_type_error: "Lastname Must Be String!"
     })
-        .min(3, "Lastname Must Be At Least 3 Charaters Long!")
+        .min(3, "Lastname Must Be At Least 3 Characters Long!")
         .max(255, "Lastname Must Not Exceed 255 Characters!"),
     email: z.string({
         required_error: "E-mail Is Required!"
@@ -21,7 +21,7 @@ const adminSchema = z.object({
         .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])/, "Password Must Containt At Least One Number And One Special Character!"),
     confirmPassword: z.string().optional().nullable()
 }).refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"], 
+    path: ["confirmPassword"],
     message: "Password And Confirm Password Are Not Match!",
 });
 
