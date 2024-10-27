@@ -64,9 +64,9 @@ class AdminService {
     async updateAdmin(id: number, data: adminType) {
 
         const admin = await this.adminRepo.show(id);
-        console.log(`Admin ID: ${admin}`);
+        //console.log(`Admin ID: ${admin}`);
 
-        if(!admin) {
+        if (!admin) {
             return null;
         } else {
 
@@ -82,7 +82,7 @@ class AdminService {
         }
 
     }
-    
+
     // UPDATE ADMIN PASSWORD METHOD
     async updateAdminPassword(id: number, data: { currentPassword: string, newPassword: string }) {
 
