@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            display: block;
+            margin: 0 auto;
+            height: 360px;
+        }
+        .message {
+            font-size: 16px;
+            text-align: left;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+    <div class="containter">
+        <img src="https://ongo.ph/static/1c1edc91f46025044ae65ee4f09b38d5/17101/lightweight.png" alt="Welcome Image">
+        <div class="message">
+            <%= message %>
+        </div>
+    </div>
+</body>
+</html>
