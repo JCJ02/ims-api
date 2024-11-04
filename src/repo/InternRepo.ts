@@ -4,7 +4,7 @@ import { internAccountType, internType } from "../types/InternType";
 class InternRepo {
 
     // CREATE INTERN METHOD
-    async createIntern(data: internAccountType, prismaTrasaction: any) {
+    async create(data: internAccountType, prismaTrasaction: any) {
 
         const newIntern = await prismaTrasaction.intern.create({
             data: {
@@ -24,63 +24,6 @@ class InternRepo {
         });
     
         return newIntern;
-
-        // const newIntern = await prisma.$transaction(async (prisma) => {
-        //     return await prisma.intern.create({
-        //         data: {
-        //             firstname: data.firstname,
-        //             lastname: data.lastname,
-        //             email: data.email,
-        //             birthdate: data.birthdate,
-        //             school: data.school,
-        //             mentor: data.mentor,
-        //             role: data.role,
-        //             account: {
-        //                 create: {
-        //                     password: data.password
-        //                 }
-        //             }
-        //         }
-        //     });
-
-        //     // try {
-            
-        //     //     await sendEmails({
-        //     //         to: createdIntern.email,
-        //     //         subject: `Welcome to the Team, ${createdIntern.firstname} ${createdIntern.lastname}! Your Intern Account is Ready! 🎉`,
-        //     //         message: `
-        //     //             Hello ${createdIntern.firstname} ${createdIntern.lastname}! <br>
-        //     //             <br>
-        //     //             Fantastic news, your <b>Intern Account</b> has been successfully created! <br>
-        //     //             <br>
-        //     //             Here are your account details: <br>
-        //     //             <br>
-        //     //             <b>Username:</b> ${createdIntern.email} <br>
-        //     //             <b>Password:</b> ${data.password} <br>
-        //     //             <br>
-        //     //             Be sure to change your password after your first <b>Sign In</b> to keep your account secure. <br>
-        //     //             <br>
-        //     //             We're thrilled to have you onboard, and we can't wait to see all the amazing things you'll achieve. <br>
-        //     //             Let's get started!
-        //     //             <br>
-        //     //             <br>
-        //     //             Best regards, <br>
-        //     //             The Lightweight Solutions Team! 🎯 <br>
-        //     //         `
-        //     //     });
-    
-        //     // } catch (error) {
-                
-        //     //     console.error("Failed To Send Email, Rolling Back Transaction: ", error);
-        //     //     throw new Error("Email Sending Failed; Rolling Back Transaction");
-
-        //     // }
-
-        //     // return createdIntern;
-
-        // });
-
-        // return newIntern;
 
     }
 
@@ -118,8 +61,22 @@ class InternRepo {
 
     }
 
+    // VALIDATE EMAIL METHOD
+    async validateEmail(email: string) {
+
+        const isEmailExist = await prisma.intern.findFirst({
+            where: {
+                email: email,
+                deletedAt: null
+            }
+        });
+
+        return isEmailExist;
+
+    }
+
     // UPDATE INTERN METHOD
-    async updateIntern(id: number, data: internType) {
+    async update(id: number, data: internType) {
         
         const editIntern = await prisma.intern.update({
             where: {
@@ -142,11 +99,12 @@ class InternRepo {
     }
 
     // UPDATE INTERN PASSWORD METHOD
-    async updateInternPassword(id: number, data: { newPassword: string }) {
+    async updatePassword(id: number, data: { newPassword: string }) {
 
         const editInternPassword = await prisma.account.update({
             where: {
                 id: id,
+                deletedAt: null
             },
             data: {
                 password: data.newPassword 
@@ -158,7 +116,7 @@ class InternRepo {
     }
 
     // DELETE INTERN METHOD
-    async deleteIntern(id: number) {
+    async delete(id: number) {
 
         const softDeleteIntern = await prisma.intern.update({
             where: {
@@ -185,35 +143,8 @@ class InternRepo {
 
     }
 
-    // INTERN LIST w/ PAGINATION METHOD
-    async getInternsList(skip: number, limit: number) {
-
-        const interns = await prisma.intern.findMany({
-            skip: skip,
-            take: limit,
-            where: {
-                deletedAt: null
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-
-        const totalInterns = await prisma.intern.count({
-            where: {
-                deletedAt: null
-            }
-        });
-
-        return {
-            interns,
-            totalInterns
-        }
-
-    }
-
-    // SEARCH INTERN w/ PAGINATION METHOD
-    async searchInterns(query: string, skip: number, limit: number) {
+    // INTERN LIST w/ SEARCH AND PAGINATION METHOD
+    async list(query: string, skip: number, limit: number) {
 
         const interns = await prisma.intern.findMany({
             skip: skip,
@@ -313,22 +244,6 @@ class InternRepo {
             interns,
             totalInterns
         }
-
-    }
-
-    // RESET PASSWORD METHOD
-    async resetInternPassword(id: number, data: { newPassword: string }) {
-        
-        const newInternPassword = await prisma.account.update({
-            where: {
-                id: id
-            },
-            data: {
-                password: data.newPassword
-            }
-        });
-
-        return newInternPassword;
 
     }
 
