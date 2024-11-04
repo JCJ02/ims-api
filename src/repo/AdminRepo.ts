@@ -4,7 +4,7 @@ import prisma from "../utils/client";
 class AdminRepo {
 
     // CREATE ADMIN METHOD
-    async createAdmin(data: adminAccountType) {
+    async create(data: adminAccountType) {
 
         const newAdmin = await prisma.$transaction(async (prisma) => {
             return await prisma.admin.create({
@@ -59,8 +59,22 @@ class AdminRepo {
 
     }
 
+    // VALIDATE EMAIL METHOD
+    async validateEmail(email: string) {
+
+        const isEmailExist = await prisma.admin.findFirst({
+            where: {
+                email: email,
+                deletedAt: null
+            }
+        });
+
+        return isEmailExist;
+
+    }
+
     // UPDATE ADMIN METHOD
-    async updateAdmin(id: number, data: adminType) {
+    async update(id: number, data: adminType) {
 
         const editAdmin = await prisma.admin.update({
             where: {
@@ -79,11 +93,12 @@ class AdminRepo {
     }
 
     // UPDATE ADMIN PASSWORD METHOD
-    async updateAdminPassword(id: number, data: { newPassword: string }) {
+    async updatePassword(id: number, data: { newPassword: string }) {
 
         const editAdminPassword = await prisma.account.update({
             where: {
                 id: id,
+                deletedAt: null
             },
             data: {
                 password: data.newPassword
@@ -95,7 +110,7 @@ class AdminRepo {
     }
 
     // DELETE ADMIN METHOD
-    async deleteAdmin(id: number) {
+    async delete(id: number) {
         const softDeleteAdmin = await prisma.admin.update({
             where: {
                 id: id,
@@ -120,35 +135,8 @@ class AdminRepo {
         return softDeleteAdmin;
     }
 
-    // GET ADMINS LIST w/ PAGINATION METHOD
-    async getAdminsList(skip: number, limit: number) {
-
-        const admins = await prisma.admin.findMany({
-            skip: skip,
-            take: limit,
-            where: {
-                deletedAt: null
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-
-        const totalAdmins = await prisma.admin.count({
-            where: {
-                deletedAt: null
-            }
-        });
-
-        return {
-            admins,
-            totalAdmins
-        }
-
-    }
-
-    // SEARCH ADMINS w/ PAGINATION METHOD
-    async searchAdmins(query: string, skip: number, limit: number) {
+    // LIST w/ SEARCH AND PAGINATION METHOD
+    async list(query: string, skip: number, limit: number) {
 
         const admins = await prisma.admin.findMany({
             skip: skip,
