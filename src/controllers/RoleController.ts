@@ -11,16 +11,15 @@ class RoleController {
 
         this.roleService = new RoleService();
 
-        this.createRole = this.createRole.bind(this);
-        this.updateRole = this.updateRole.bind(this);
-        this.deleteRole = this.deleteRole.bind(this);
-        this.getRoles = this.getRoles.bind(this);
-        this.searchRoles = this.searchRoles.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+        this.list = this.list.bind(this);
 
     }
 
     // CREATE ROLE METHOD
-    async createRole(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
         try {
 
             const validateRoleData = roleSchema.safeParse(req.body);
@@ -36,7 +35,7 @@ class RoleController {
 
             } else {
 
-                const newRole = await this.roleService.createRole(validateRoleData.data);
+                const newRole = await this.roleService.create(validateRoleData.data);
                 return AppResponse.sendSuccessful({
                     res,
                     data: {
@@ -61,7 +60,7 @@ class RoleController {
     }
 
     // UPDATE ROLE METHOD
-    async updateRole(req: Request, res: Response) {
+    async update(req: Request, res: Response) {
         try {
 
             const validateRoleData = roleSchema.safeParse(req.body);
@@ -76,7 +75,7 @@ class RoleController {
                 });
 
             } else {
-                const editedRole = await this.roleService.updateRole(req, validateRoleData.data);
+                const editedRole = await this.roleService.update(req, validateRoleData.data);
 
                 if(!editedRole) {
                     return AppResponse.sendErrors({
@@ -108,12 +107,12 @@ class RoleController {
     }
 
     // DELETE ROLE METHOD
-    async deleteRole(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
 
             const id = Number(req.params.id);
 
-            const isRoleExist = await this.roleService.deleteRole(id);
+            const isRoleExist = await this.roleService.delete(id);
 
             if(!isRoleExist) {
                 return AppResponse.sendErrors({
@@ -141,36 +140,11 @@ class RoleController {
         }
     }
 
-    // GET ROLES w/ PAGINATION METHOD
-    async getRoles(req: Request, res: Response) {
+    // ROLE LIST w/ SEARCH AND PAGINATION
+    async list(req: Request, res: Response) {
         try {
 
-            const paginatedRoles = await this.roleService.getRoles(req);
-
-            return AppResponse.sendSuccessful({
-                res,
-                data: paginatedRoles,
-                message: "List Of Roles!",
-                code: 200,
-            });
-
-        } catch (error: any) {
-
-            return AppResponse.sendErrors({
-                res,
-                data: null,
-                message: error.message,
-                code: 500,
-            });
-
-        }
-    }
-
-    // SEARCH ROLES METHOD
-    async searchRoles(req: Request, res: Response) {
-        try {
-
-            const searchResults = await this.roleService.searchRoles(req);
+            const searchResults = await this.roleService.list(req);
 
             return AppResponse.sendSuccessful({
                 res,

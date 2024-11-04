@@ -12,7 +12,7 @@ class RoleService {
     }
 
     // CREATE ROLE METHOD
-    async createRole(data: any) {
+    async create(data: any) {
 
         const lastRoleId = await this.roleRepo.validateRoleId(data.id);
 
@@ -37,14 +37,14 @@ class RoleService {
             ...data
         }
 
-        const newRole = await this.roleRepo.createRole(roleData);
+        const newRole = await this.roleRepo.create(roleData);
         
         return newRole;
 
     }
 
     // UPDATE ROLE METHOD
-    async updateRole(req: Request, data: any) {
+    async update(req: Request, data: any) {
         
         const id = Number(req.params.id);
 
@@ -53,35 +53,22 @@ class RoleService {
             ...data
         }
 
-        const editRole = await this.roleRepo.updateRole(roleData);
+        const editRole = await this.roleRepo.update(roleData);
 
         return editRole;
 
     }
 
     // DELETE ROLE METHOD
-    async deleteRole(id: number) {
+    async delete(id: number) {
 
-        return await this.roleRepo.deleteRole(id);
-
-    }
-
-    // GET ROLES w/ PAGINATION METHOD
-    async getRoles(req: Request) {
-
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
-
-        const skip = (page - 1) * limit;
-
-        const paginatedRoles = await this.roleRepo.getRoles(skip, limit);
-
-        return paginatedRoles;
+        return await this.roleRepo.delete(id);
 
     }
 
-    // SEARCH ROLES METHOD
-    async searchRoles(req: Request) {
+
+    // ROLE LIST w/ SEARCH AND PAGINATION
+    async list(req: Request) {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
@@ -89,7 +76,7 @@ class RoleService {
 
         const skip = (page - 1) * limit;
 
-        const searchResults = await this.roleRepo.searchRoles(query, skip, limit);
+        const searchResults = await this.roleRepo.list(query, skip, limit);
 
         return searchResults;
 
