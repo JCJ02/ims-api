@@ -15,6 +15,7 @@ class MentorController {
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
         this.list = this.list.bind(this);
+        this.get = this.get.bind(this);
 
     }
 
@@ -190,6 +191,39 @@ class MentorController {
             });
         }
 
+    }
+
+    async get(req: Request, res: Response) {
+        try {
+
+            const mentor = Number(req.params.id);
+
+            const isMentorExist = await this.mentorService.show(mentor);
+
+            if(!isMentorExist) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Mentor Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: isMentorExist,
+                    message: "Mentor Found!",
+                    code: 200
+                });
+            }
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
     }
 
 }
