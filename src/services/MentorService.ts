@@ -13,20 +13,54 @@ class MentorService {
     }
 
     // CREATE MENTOR METHOD
-    async createMentor(data: mentorType) {
-        
-        const mentorData = {
-            ...data
+    async create(data: mentorType) {
+
+        const isEmailExist = await this.mentorRepo.validateEmail(data.email);
+
+        if(isEmailExist) {
+            return null;
+        } else {
+
+            const mentorData = {
+                ...data
+            }
+    
+            const newMentor = await this.mentorRepo.create(mentorData);
+    
+            return newMentor;
+
         }
 
-        const newMentor = await this.mentorRepo.createMentor(mentorData);
+    }
 
-        return newMentor;
+    // SHOW METHOD
+    async show(id: number) {
+
+        const mentor = await this.mentorRepo.show(id);
+
+        if(!mentor) {
+            return null;
+        }
+
+        return mentor;
+
+    }
+
+    // VALIDATE EMAIL METHOD
+    async validateEmail(email: string) {
+
+        const emailAddress = await this.mentorRepo.validateEmail(email);
+
+        if(!emailAddress) {
+            return null;
+        }
+
+        return emailAddress;
 
     }
 
     // UPDATE MENTOR METHOD
-    async updateMentor(id: number, data: mentorType) {
+    async update(id: number, data: mentorType) {
 
         const mentor = await this.mentorRepo.show(id);
 
@@ -38,7 +72,7 @@ class MentorService {
                 ...data
             }
 
-            const updateMentorData = await this.mentorRepo.updateMentor(mentor.id, mentorData);
+            const updateMentorData = await this.mentorRepo.update(mentor.id, mentorData);
 
             return updateMentorData;
 
@@ -47,7 +81,7 @@ class MentorService {
     }
 
     // SOFT DELETE MENTOR METHOD
-    async deleteMentor(id: number) {
+    async delete(id: number) {
 
         const mentor = await this.mentorRepo.show(id);
 
@@ -55,7 +89,7 @@ class MentorService {
             return null;
         } else {
 
-            const deleteMentor = await this.mentorRepo.deleteMentor(mentor.id);
+            const deleteMentor = await this.mentorRepo.delete(mentor.id);
 
             return deleteMentor;
 
@@ -63,22 +97,8 @@ class MentorService {
 
     }
 
-    // GET MENTORS LIST w/ PAGINATION METHOD
-    async getMentorsList(req: Request) {
-
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
-
-        const skip = (page - 1) * limit;
-
-        const paginatedMentors = await this.mentorRepo.getMentorsList(skip, limit);
-
-        return paginatedMentors;
-
-    }
-
-    // SEARCH MENTORS w/ PAGINATION METHOD
-    async searchMentors(req: Request) {
+    // MENTOR LIST w/ SEARCH AND PAGINATION METHOD
+    async list(req: Request) {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
@@ -86,7 +106,7 @@ class MentorService {
 
         const skip = (page - 1) * limit;
 
-        const searchMentors = await this.mentorRepo.searchMentors(query, skip, limit);
+        const searchMentors = await this.mentorRepo.list(query, skip, limit);
 
         return searchMentors;
 

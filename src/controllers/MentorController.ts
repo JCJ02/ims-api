@@ -11,16 +11,16 @@ class MentorController {
         
         this.mentorService = new MentorService();
 
-        this.createMentor = this.createMentor.bind(this);
-        this.updateMentor = this.updateMentor.bind(this);
-        this.deleteMentor = this.deleteMentor.bind(this);
-        this.getMentorsList = this.getMentorsList.bind(this);
-        this.searchMentors = this.searchMentors.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+        this.list = this.list.bind(this);
+        this.get = this.get.bind(this);
 
     }
 
     // CREATE MENTOR METHOD
-    async createMentor(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
         
         try {
 
@@ -35,13 +35,13 @@ class MentorController {
                 });
             } else {
 
-                const newMentor = await this.mentorService.createMentor(validateMentorData.data);
+                const newMentor = await this.mentorService.create(validateMentorData.data);
 
                 if(!newMentor) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
-                        message: "Failed To Register Credentials!",
+                        message: "E-mail Is Already Exist!",
                         code: 403
                     });
                 } else {
@@ -68,7 +68,7 @@ class MentorController {
     }
 
     // UPDATE MENTOR METHOD
-    async updateMentor(req: Request, res: Response) {
+    async update(req: Request, res: Response) {
 
         try {
 
@@ -85,7 +85,7 @@ class MentorController {
                 });
             } else {
 
-                const updatedMentorData = await this.mentorService.updateMentor(mentorId, validatedMentorData.data);
+                const updatedMentorData = await this.mentorService.update(mentorId, validatedMentorData.data);
     
                 if(!updatedMentorData) {
 
@@ -122,7 +122,7 @@ class MentorController {
     }
 
     // SOFT DELETE MENTOR METHOD
-    async deleteMentor(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
 
         try {
 
@@ -137,7 +137,7 @@ class MentorController {
                 });
             } else {
 
-                const isMentorDeleted = await this.mentorService.deleteMentor(mentorId);
+                const isMentorDeleted = await this.mentorService.delete(mentorId);
 
                 if(!isMentorDeleted) {
                     return AppResponse.sendErrors({
@@ -168,37 +168,12 @@ class MentorController {
 
     }
 
-    // GET MENTORS LIST w/ PAGINATION METHOD
-    async getMentorsList(req: Request, res: Response) {
-
-        try {
-
-            const paginatedMentors = await this.mentorService.getMentorsList(req);
-
-            return AppResponse.sendSuccessful({
-                res,
-                data: paginatedMentors,
-                message: "List of Mentors!",
-                code: 200
-            });
-            
-        } catch (error: any) {
-            return AppResponse.sendErrors({
-                res,
-                data: null,
-                message: error.message,
-                code: 500
-            });
-        }
-
-    }
-
     // SEARCH MENTORS w/ PAGINATION METHOD
-    async searchMentors(req: Request, res: Response) {
+    async list(req: Request, res: Response) {
 
         try {
         
-            const searchResults = await this.mentorService.searchMentors(req);
+            const searchResults = await this.mentorService.list(req);
 
             return AppResponse.sendSuccessful({
                 res,
@@ -216,6 +191,39 @@ class MentorController {
             });
         }
 
+    }
+
+    async get(req: Request, res: Response) {
+        try {
+
+            const mentor = Number(req.params.id);
+
+            const isMentorExist = await this.mentorService.show(mentor);
+
+            if(!isMentorExist) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Mentor Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: isMentorExist,
+                    message: "Mentor Found!",
+                    code: 200
+                });
+            }
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
     }
 
 }

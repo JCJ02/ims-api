@@ -1,13 +1,14 @@
 import express from "express";
 import MentorController from "../controllers/MentorController";
+import authMiddleware from "../middleware/AuthMiddleware";
 
 const mentorRoute = express.Router();
 const mentorController = new MentorController();
 
-mentorRoute.post("/create", mentorController.createMentor);
-mentorRoute.put("/update/:id", mentorController.updateMentor);
-mentorRoute.put("/delete/:id", mentorController.deleteMentor);
-mentorRoute.get("/get-mentors", mentorController.getMentorsList);
-mentorRoute.get("/get-mentors/search", mentorController.searchMentors);
+mentorRoute.post("/", authMiddleware, mentorController.create);
+mentorRoute.put("/:id", authMiddleware, mentorController.update);
+mentorRoute.delete("/:id", authMiddleware, mentorController.delete);
+mentorRoute.get("/", authMiddleware, mentorController.list);
+mentorRoute.get("/:id", authMiddleware, mentorController.get);
 
 export default mentorRoute;

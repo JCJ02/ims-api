@@ -4,7 +4,7 @@ import prisma from "../utils/client";
 class MentorRepo {
 
     // CREATE MENTOR METHOD
-    async createMentor(data: mentorType) {
+    async create(data: mentorType) {
 
         const newMentor = await prisma.$transaction( async (prisma) => {
             return await prisma.mentor.create({
@@ -35,8 +35,22 @@ class MentorRepo {
 
     }
 
+    // VALIDATE EMAIL METHOD
+    async validateEmail(email: string) {
+
+        const isEmailExist = await prisma.mentor.findFirst({
+            where: {
+                email: email,
+                deletedAt: null
+            }
+        });
+
+        return isEmailExist;
+
+    }
+
     // UPDATE MENTOR METHOD
-    async updateMentor(id: number, data: mentorType) {
+    async update(id: number, data: mentorType) {
         
         const updateMentorData = await prisma.mentor.update({
             where: {
@@ -55,7 +69,7 @@ class MentorRepo {
     }
 
     // SOFT DELETE MENTOR METHOD
-    async deleteMentor(id: number) {
+    async delete(id: number) {
 
         const softDeleteMentor = await prisma.mentor.update({
             where: {
@@ -71,35 +85,8 @@ class MentorRepo {
 
     }
 
-    // GET MENTORS LIST w/ PAGINATION METHOD
-    async getMentorsList(skip: number, limit: number) {
-
-        const mentors = await prisma.mentor.findMany({
-            skip: skip,
-            take: limit,
-            where: {
-                deletedAt: null
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-
-        const totalMentors = await prisma.mentor.count({
-            where: {
-                deletedAt: null
-            }
-        });
-
-        return {
-            mentors,
-            totalMentors
-        }
-
-    }
-
-    // SEARCH MENTORS w/ PAGINATION METHOD
-    async searchMentors(query: string, skip: number, limit: number) {
+    // MENTOR LIST w/ SEARCH AND PAGINATION METHOD
+    async list(query: string, skip: number, limit: number) {
 
         const mentors = await prisma.mentor.findMany({
             skip: skip,

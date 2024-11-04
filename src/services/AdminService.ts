@@ -14,19 +14,27 @@ class AdminService {
     }
 
     // CREATE ADMIN METHOD
-    async createAdmin(data: adminAccountType) {
+    async create(data: adminAccountType) {
 
-        const hashedPassword = bcrypt.hashSync(data.password, 10);
-        //console.log(data.password);
-        const adminData = {
-            ...data,
-            password: hashedPassword,
-        };
-        //console.log(hashedPassword);
+        const isEmailExist = await this.adminRepo.validateEmail(data.email);
 
-        const newAdmin = await this.adminRepo.createAdmin(adminData);
+        if(isEmailExist) {
+            return null;
+        } else {
 
-        return newAdmin;
+            const hashedPassword = bcrypt.hashSync(data.password, 10);
+            //console.log(data.password);
+            const adminData = {
+                ...data,
+                password: hashedPassword,
+            };
+            //console.log(hashedPassword);
+
+            const newAdmin = await this.adminRepo.create(adminData);
+
+            return newAdmin;
+
+        }
 
     }
     // AUTHENTICATE OR LOG IN ADMIN METHOD
@@ -56,12 +64,31 @@ class AdminService {
     // SHOW METHOD
     async show(id: number) {
 
-        return await this.adminRepo.show(id);
+        const admin = await this.adminRepo.show(id);
+
+        if(!admin) {
+            return null;
+        }
+
+        return admin;
 
     }
 
+    // VALIDATE EMAIL METHOD
+    async validateEmail(email: string) {
+
+        const emailAddress = await this.adminRepo.validateEmail(email);
+
+        if(!emailAddress) {
+            return null;
+        }
+
+        return emailAddress;
+        
+    }
+
     // UPDATE ADMIN METHOD
-    async updateAdmin(id: number, data: adminType) {
+    async update(id: number, data: adminType) {
 
         const admin = await this.adminRepo.show(id);
         //console.log(`Admin ID: ${admin}`);
@@ -74,7 +101,7 @@ class AdminService {
                 ...data
             }
 
-            const updateAdminData = await this.adminRepo.updateAdmin(admin.id, adminData);
+            const updateAdminData = await this.adminRepo.update(admin.id, adminData);
             console.log(`Update Admin Data: ${updateAdminData}`);
 
             return updateAdminData;
@@ -84,7 +111,7 @@ class AdminService {
     }
 
     // UPDATE ADMIN PASSWORD METHOD
-    async updateAdminPassword(id: number, data: { currentPassword: string, newPassword: string }) {
+    async updatePassword(id: number, data: { currentPassword: string, newPassword: string }) {
 
         const admin = await this.adminRepo.show(id);
 
@@ -102,14 +129,14 @@ class AdminService {
 
         const hashedNewPassword = bcrypt.hashSync(data.newPassword, 10);
 
-        const updatedPassword = await this.adminRepo.updateAdminPassword(admin.account[0].id, { newPassword: hashedNewPassword });
+        const updatedPassword = await this.adminRepo.updatePassword(admin.account[0].id, { newPassword: hashedNewPassword });
 
         return updatedPassword;
 
     }
 
     // DELETE ADMIN METHOD
-    async deleteAdmin(id: number) {
+    async delete(id: number) {
 
         const admin = await this.adminRepo.show(id);
         // console.log(Admin: ${admin});
@@ -117,12 +144,13 @@ class AdminService {
             return null;
         }
 
-        const deletedAdmin = await this.adminRepo.deleteAdmin(admin.id);
+        const deletedAdmin = await this.adminRepo.delete(admin.id);
         // console.log(ID: ${deletedAdmin});
         return deletedAdmin;
 
     }
 
+    // SENDING E-MAILS METHOD
     async sendEmail(data: { email: string, subject: string, message: string }) {
 
         const options = {
@@ -135,22 +163,8 @@ class AdminService {
 
     }
 
-    // GET ADMINS LIST w/ PAGINATION METHOD
-    async getAdminsList(req: Request) {
-
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = parseInt(req.query.limit as string) || 10;
-
-        const skip = (page - 1) * limit;
-
-        const paginatedAdmins = await this.adminRepo.getAdminsList(skip, limit);
-
-        return paginatedAdmins;
-
-    }
-
-    // SEARCH ADMINS w/ PAGINATION METHOD
-    async searchAdmins(req: Request) {
+    // LIST w/ SEARCH AND PAGINATION METHOD
+    async list(req: Request) {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
@@ -158,7 +172,7 @@ class AdminService {
 
         const skip = (page - 1) * limit;
 
-        const searchAdmins = await this.adminRepo.searchAdmins(query, skip, limit);
+        const searchAdmins = await this.adminRepo.list(query, skip, limit);
 
         return searchAdmins;
 

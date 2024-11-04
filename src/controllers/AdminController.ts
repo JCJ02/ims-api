@@ -17,15 +17,15 @@ class AdminController {
         this.testService = new TestService();
 
         this.test = this.test.bind(this);
-        this.index = this.index.bind(this);
-        this.createAdmin = this.createAdmin.bind(this);
+        this.dashboard = this.dashboard.bind(this);
+        this.create = this.create.bind(this);
         this.authenticate = this.authenticate.bind(this);
-        this.updateAdmin = this.updateAdmin.bind(this);
-        this.updateAdminPassword = this.updateAdminPassword.bind(this);
-        this.deleteAdmin = this.deleteAdmin.bind(this);
+        this.update = this.update.bind(this);
+        this.updatePassword = this.updatePassword.bind(this);
+        this.delete = this.delete.bind(this);
         this.sendEmail = this.sendEmail.bind(this);
-        this.getAdminsList = this.getAdminsList.bind(this);
-        this.searchAdmins = this.searchAdmins.bind(this);
+        this.list = this.list.bind(this);
+        this.get = this.get.bind(this);
 
     }
 
@@ -61,7 +61,7 @@ class AdminController {
         }
     }
 
-    async index(req: authMiddlewareRequest, res: Response) {
+    async dashboard(req: authMiddlewareRequest, res: Response) {
 
         try {
 
@@ -103,7 +103,7 @@ class AdminController {
     }
 
     // CREATE ADMIN METHOD
-    async createAdmin(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
 
         try {
 
@@ -118,13 +118,13 @@ class AdminController {
                 });
             }
 
-            const newAdmin = await this.adminService.createAdmin(validateAdminData.data);
+            const newAdmin = await this.adminService.create(validateAdminData.data);
 
             if (!newAdmin) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Failed To Register Credentials!",
+                    message: "E-mail Is Already Exist!",
                     code: 403
                 });
             } else {
@@ -195,7 +195,7 @@ class AdminController {
     }
 
     // UPDATE ADMIN METHOD
-    async updateAdmin(req: Request, res: Response) {
+    async update(req: Request, res: Response) {
 
         try {
 
@@ -212,7 +212,7 @@ class AdminController {
                 });
             } else {
 
-                const updatedAdminData = await this.adminService.updateAdmin(adminId, validateAdminData.data);
+                const updatedAdminData = await this.adminService.update(adminId, validateAdminData.data);
 
                 if (!updatedAdminData) {
                     return AppResponse.sendErrors({
@@ -246,7 +246,7 @@ class AdminController {
     }
 
     // ADMIN ADMIN PASSWORD METHOD
-    async updateAdminPassword(req: Request, res: Response) {
+    async updatePassword(req: Request, res: Response) {
 
         try {
 
@@ -264,7 +264,7 @@ class AdminController {
             }
             //console.log("Validated Password: ", validatePasswords);
 
-            const updatedPassword = await this.adminService.updateAdminPassword(adminId, validatePasswords.data);
+            const updatedPassword = await this.adminService.updatePassword(adminId, validatePasswords.data);
             //console.log("Updated Password: ", updatedPassword);
             if (!updatedPassword) {
                 return AppResponse.sendErrors({
@@ -294,7 +294,7 @@ class AdminController {
     }
 
     // DELETE ADMIN METHOD
-    async deleteAdmin(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         try {
 
             const id = Number(req.params.id);
@@ -307,7 +307,7 @@ class AdminController {
                     code: 404
                 });
             } else {
-                const isAdminDeleted = await this.adminService.deleteAdmin(id);
+                const isAdminDeleted = await this.adminService.delete(id);
                 // console.log(`Admin Existence: ${isAdminDeleted}`);
                 if (!isAdminDeleted) {
                     return AppResponse.sendErrors({
@@ -389,39 +389,12 @@ class AdminController {
         }
     }
 
-    // GET ADMINS LIST w/ PAGINATION METHOD
-    async getAdminsList(req: Request, res: Response) {
+    // LIST w/ SEARCH AND PAGINATION METHOD
+    async list(req: Request, res: Response) {
 
         try {
 
-            const paginatedAdmins = await this.adminService.getAdminsList(req);
-
-            return AppResponse.sendSuccessful({
-                res,
-                data: paginatedAdmins,
-                message: "List of Admins!",
-                code: 200
-            });
-
-        } catch (error: any) {
-
-            return AppResponse.sendErrors({
-                res,
-                data: null,
-                message: error.message,
-                code: 500
-            });
-
-        }
-
-    }
-
-    // SEARCH ADMINS w/ PAGINATION METHOD
-    async searchAdmins(req: Request, res: Response) {
-
-        try {
-
-            const searchResults = await this.adminService.searchAdmins(req);
+            const searchResults = await this.adminService.list(req);
 
             return AppResponse.sendSuccessful({
                 res,
@@ -441,6 +414,39 @@ class AdminController {
 
         }
 
+    }
+
+    async get(req: Request, res: Response) {
+        try {
+
+            const admin = Number(req.params.id);
+
+            const isAdminExist = await this.adminService.show(admin);
+
+            if(!isAdminExist) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: isAdminExist,
+                    message: "Admin Found!",
+                    code: 200
+                });
+            }
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
     }
 
 }

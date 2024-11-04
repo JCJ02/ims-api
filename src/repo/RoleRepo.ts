@@ -3,7 +3,7 @@ import prisma from "../utils/client";
 class RoleRepo {
 
     // CREATE ROLE METHOD
-    async createRole(data: any) {
+    async create(data: any) {
         
         const newRole = await prisma.role.create({
             data: {
@@ -34,7 +34,7 @@ class RoleRepo {
     }
 
     // UPDATE ROLE METHOD
-    async updateRole(data: any) {
+    async update(data: any) {
 
         const editRole = await prisma.role.update({
             where: {
@@ -51,7 +51,7 @@ class RoleRepo {
     }
 
     // DELETE ROLE METHOD
-    async deleteRole(id: number) {
+    async delete(id: number) {
 
         const removeRole = await prisma.role.update({
             where: {
@@ -94,8 +94,8 @@ class RoleRepo {
 
     }
 
-    // SEARCH ROLES METHOD
-    async searchRoles(query: string, skip: number, limit: number) {
+    // ROLE LIST w/ SEARCH AND PAGINATION
+    async list(query: string, skip: number, limit: number) {
 
         const roles = await prisma.role.findMany({
             skip: skip,

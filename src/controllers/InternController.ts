@@ -13,19 +13,19 @@ class InternController {
 
         this.internService = new InternService();
         
-        this.index = this.index.bind(this);
-        this.createIntern = this.createIntern.bind(this);
-        this.updateIntern = this.updateIntern.bind(this);
-        this.updateInternPassword = this.updateInternPassword.bind(this);
+        this.dashboard = this.dashboard.bind(this);
+        this.create = this.create.bind(this);
         this.authenticate = this.authenticate.bind(this);
-        this.deleteIntern = this.deleteIntern.bind(this);
-        this.getInternsList = this.getInternsList.bind(this);
-        this.searchInterns = this.searchInterns.bind(this);
-        this.resetInternPassword = this.resetInternPassword.bind(this);
+        this.update = this.update.bind(this);
+        this.updatePassword = this.updatePassword.bind(this);
+        this.delete = this.delete.bind(this);
+        this.list = this.list.bind(this);
+        this.get = this.get.bind(this);
+        this.resetPassword = this.resetPassword.bind(this);
 
     }
 
-    async index(req: authMiddlewareRequest, res: Response) {
+    async dashboard(req: authMiddlewareRequest, res: Response) {
         try {
             const intern = req.user;
             if(!intern) {
@@ -60,7 +60,7 @@ class InternController {
     }
 
     // CREATE INTERN
-    async createIntern(req: Request, res: Response) {
+    async create(req: Request, res: Response) {
 
         try {
 
@@ -73,26 +73,28 @@ class InternController {
                     message: validateInternData.error.errors[0].message,
                     code: 400
                 });
-            }
-
-            const newIntern = await this.internService.createIntern(validateInternData.data);
-
-            if(!newIntern) {
-                return AppResponse.sendErrors({
-                    res,
-                    data: null,
-                    message: "Failed To Register Credentials!",
-                    code: 403
-                });
             } else {
-                return AppResponse.sendSuccessful({
-                    res,
-                    data: {
-                        intern: newIntern
-                    },
-                    message: "Successfully Registered!",
-                    code: 201
-                })
+
+                const newIntern = await this.internService.create(validateInternData.data);
+
+                if(!newIntern) {
+                    return AppResponse.sendErrors({
+                        res,
+                        data: null,
+                        message: "E-mail Is Already Exist!",
+                        code: 403
+                    });
+                } else {
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: {
+                            intern: newIntern
+                        },
+                        message: "Successfully Registered!",
+                        code: 201
+                    })
+                }
+
             }
 
         } catch (error: any) {
@@ -154,7 +156,7 @@ class InternController {
     }
 
     // UPDATE INTERN METHOD
-    async updateIntern(req: Request, res: Response) {
+    async update(req: Request, res: Response) {
         
         try {
 
@@ -180,7 +182,7 @@ class InternController {
                     });
                 } else {
 
-                    const updateInternData = await this.internService.updateIntern(internId, validateInternData.data);
+                    const updateInternData = await this.internService.update(internId, validateInternData.data);
 
                     if(!updateInternData) {
                         return AppResponse.sendErrors({
@@ -217,7 +219,7 @@ class InternController {
     }
 
     // UPDATE INTERN PASSWORD METHOD
-    async updateInternPassword(req: Request, res: Response) {
+    async updatePassword(req: Request, res: Response) {
         
         try {
             
@@ -234,7 +236,7 @@ class InternController {
                 });
             } else {
 
-                const updatedPassword = await this.internService.updateInternPassword(internId, validatePasswords.data);
+                const updatedPassword = await this.internService.updatePassword(internId, validatePasswords.data);
 
                 if(!updatedPassword) {
                     return AppResponse.sendErrors({
@@ -266,7 +268,7 @@ class InternController {
     }
 
     // DELETE INTERN METHOD
-    async deleteIntern(req: Request, res: Response) {
+    async delete(req: Request, res: Response) {
         
         try {
             
@@ -280,7 +282,7 @@ class InternController {
                     code: 400
                 });
             } else {
-                const isInternDeleted = await this.internService.deleteIntern(internId);
+                const isInternDeleted = await this.internService.delete(internId);
 
                 if(!isInternDeleted) {
                     return AppResponse.sendErrors({
@@ -310,39 +312,12 @@ class InternController {
 
     }
 
-    // GET INTERNS w/ PAGINATION METHOD
-    async getInternsList(req: Request, res: Response) {
+    // INTERN LIST w/ SEARCH AND PAGINATION METHOD
+    async list(req: Request, res: Response) {
 
         try {
             
-            const paginatedInterns = await this.internService.getInterns(req);
-
-            return AppResponse.sendSuccessful({
-                res,
-                data: paginatedInterns,
-                message: "List of Interns!",
-                code: 200
-            })
-
-        } catch (error: any) {
-            
-            return AppResponse.sendErrors({
-                res,
-                data: null,
-                message: error.message,
-                code: 500
-            });
-
-        }
-
-    }
-
-    // SEARCH INTERN w/ PAGINATION METHOD
-    async searchInterns(req: Request, res: Response) {
-
-        try {
-            
-            const searchResults = await this.internService.searchInterns(req);
+            const searchResults = await this.internService.list(req);
 
             return AppResponse.sendSuccessful({
                 res,
@@ -364,14 +339,50 @@ class InternController {
 
     }
 
+    async get(req: Request, res: Response) {
+        try {
+
+            const intern = Number(req.params.id);
+
+            const isInternExist = await this.internService.show(intern);
+
+            // console.log(`Intern Data: ${isInternExist}`);
+
+            if(!isInternExist) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Intern Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: isInternExist,
+                    message: "Intern Found!",
+                    code: 200
+                });
+            }
+
+            
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+    }
+
     // RESET PASSWORD METHOD
-    async resetInternPassword(req: Request, res: Response) {
+    async resetPassword(req: Request, res: Response) {
 
         try {
 
             const internId = Number(req.params.id);
 
-            const isPasswordUpdated = await this.internService.resetInternPassword(internId);
+            const isPasswordUpdated = await this.internService.resetPassword(internId);
 
             if(!isPasswordUpdated) {
                 return AppResponse.sendErrors({

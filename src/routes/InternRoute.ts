@@ -1,18 +1,18 @@
 import express from "express";
 import InternController from "../controllers/InternController";
-import authMiddleware from "../middlewares/AuthMiddleware";
+import authMiddleware from "../middleware/AuthMiddleware";
 
 const internRoute = express.Router();
 const internController = new InternController();
 
-internRoute.get("/index", authMiddleware, internController.index);
-internRoute.post("/create", internController.createIntern);
+internRoute.get("/", authMiddleware, internController.dashboard);
+internRoute.post("/", authMiddleware, internController.create);
 internRoute.post("/authenticate", internController.authenticate);
-internRoute.put("/update/:id", internController.updateIntern);
-internRoute.put("/update-password/:id", internController.updateInternPassword);
-internRoute.put("/delete/:id", internController.deleteIntern);
-internRoute.get("/get-interns", internController.getInternsList);
-internRoute.get("/get-interns/search", internController.searchInterns);
-internRoute.put("/reset-password/:id", internController.resetInternPassword);
+internRoute.put("/:id", authMiddleware, internController.update);
+internRoute.put("/update-password/:id", authMiddleware, internController.updatePassword);
+internRoute.delete("/:id", authMiddleware, internController.delete);
+internRoute.get("/list", authMiddleware, internController.list);
+internRoute.get("/:id", authMiddleware, internController.get);
+internRoute.put("/reset-password/:id", authMiddleware, internController.resetPassword);
 
 export default internRoute;
