@@ -18,7 +18,7 @@ class AdminService {
 
         const isEmailExist = await this.adminRepo.validateEmail(data.email);
 
-        if(isEmailExist) {
+        if (isEmailExist) {
             return null;
         } else {
 
@@ -66,7 +66,7 @@ class AdminService {
 
         const admin = await this.adminRepo.show(id);
 
-        if(!admin) {
+        if (!admin) {
             return null;
         }
 
@@ -79,12 +79,12 @@ class AdminService {
 
         const emailAddress = await this.adminRepo.validateEmail(email);
 
-        if(!emailAddress) {
+        if (!emailAddress) {
             return null;
         }
 
         return emailAddress;
-        
+
     }
 
     // UPDATE ADMIN METHOD
