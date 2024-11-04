@@ -423,7 +423,7 @@ class AdminController {
 
             const isAdminExist = await this.adminService.show(admin);
 
-            if(!isAdminExist) {
+            if (!isAdminExist) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -438,7 +438,7 @@ class AdminController {
                     code: 200
                 });
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
