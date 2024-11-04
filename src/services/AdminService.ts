@@ -150,6 +150,7 @@ class AdminService {
 
     }
 
+    // SENDING E-MAILS METHOD
     async sendEmail(data: { email: string, subject: string, message: string }) {
 
         const options = {
