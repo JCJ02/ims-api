@@ -91,11 +91,18 @@ class AdminService {
     async update(id: number, data: adminType) {
 
         const admin = await this.adminRepo.show(id);
-        console.log(`Admin ID: ${admin}`);
+        // console.log(`Admin ID: ${admin}`);
 
         if(!admin) {
             return null;
         } else {
+
+            if(data.email) {
+                const emailExist = await this.adminRepo.validateEmail(data.email);
+                if(emailExist && emailExist.id !== id) {
+                    return null;
+                }
+            }
 
             const adminData = {
                 ...data

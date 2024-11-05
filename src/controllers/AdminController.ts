@@ -218,7 +218,7 @@ class AdminController {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
-                        message: "Failed To Update!",
+                        message: "E-mail Is Already Exist!",
                         code: 403
                     });
                 } else {
