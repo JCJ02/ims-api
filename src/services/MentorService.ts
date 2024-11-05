@@ -68,6 +68,13 @@ class MentorService {
             return null;
         } else {
 
+            if(data.email) {
+                const isEmailExist = await this.mentorRepo.validateEmail(data.email);
+                if(isEmailExist && isEmailExist.id !== id) {
+                    return null;
+                }
+            }
+
             const mentorData = {
                 ...data
             }

@@ -160,6 +160,8 @@ class InternController {
         
         try {
 
+            const internId = Number(req.params.id);
+
             const validateInternData = updateInternSchema.safeParse(req.body);
 
             if(validateInternData.error) {
@@ -171,37 +173,24 @@ class InternController {
                 });
             } else {
 
-                const internId = Number(req.params.id);
+                const updateInternData = await this.internService.update(internId, validateInternData.data);
 
-                if(!internId) {
+                if(!updateInternData) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
-                        message: "Intern Not Found!",
+                        message: "E-mail Is Already Exist!",
                         code: 403
                     });
                 } else {
-
-                    const updateInternData = await this.internService.update(internId, validateInternData.data);
-
-                    if(!updateInternData) {
-                        return AppResponse.sendErrors({
-                            res,
-                            data: null,
-                            message: "Failed To Update!",
-                            code: 403
-                        });
-                    } else {
-                        return AppResponse.sendSuccessful({
-                            res,
-                            data: {
-                                intern: updateInternData
-                            },
-                            message: "Successfully Updated!",
-                            code: 201
-                        });
-                    }
-
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: {
+                            intern: updateInternData
+                        },
+                        message: "Successfully Updated!",
+                        code: 201
+                    });
                 }
 
             }
