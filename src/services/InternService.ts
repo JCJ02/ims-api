@@ -137,6 +137,13 @@ class InternService {
             return null;
         } else {
 
+            if(data.email) {
+                const isEmailExist = await this.internRepo.validateEmail(data.email);
+                if(isEmailExist && isEmailExist.id !== id) {
+                    return null;
+                }
+            }
+
             const internData = {
                 ...data
             }
