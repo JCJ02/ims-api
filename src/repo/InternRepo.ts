@@ -47,7 +47,7 @@ class InternRepo {
     // SHOW METHOD
     async show(id: number) {
 
-        const internId = await prisma.intern.findUnique({
+        const internId = await prisma.intern.findFirst({
             where: {
                 id: id,
                 deletedAt: null
@@ -72,6 +72,24 @@ class InternRepo {
         });
 
         return isEmailExist;
+
+    }
+
+    async deleted(id: number) {
+
+        const internId = await prisma.intern.findFirst({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            },
+            include: {
+                account: true
+            }
+        });
+
+        return internId;
 
     }
 
@@ -243,6 +261,146 @@ class InternRepo {
         return {
             interns,
             totalInterns
+        }
+
+    }
+
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const restoreIntern = await prisma.intern.update({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            },
+            data: {
+                deletedAt: null,
+                account: {
+                    updateMany: {
+                        where: {
+                            internId: id,
+                            deletedAt: {
+                                not: null
+                            }
+                        },
+                        data: {
+                            deletedAt: null
+                        }
+                    }
+                }
+            }
+        });
+
+        return restoreIntern;
+
+    }
+
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    async archiveList(query: string, skip: number, limit: number) {
+
+        const deletedInterns = await prisma.intern.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        school: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        mentor: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalDeletedInterns = await prisma.intern.count({
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        school: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        mentor: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
+
+        return {
+            deletedInterns,
+            totalDeletedInterns
         }
 
     }

@@ -185,6 +185,36 @@ class AdminService {
 
     }
 
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const deletedAdmin = await this.adminRepo.deleted(id);
+
+        if(!deletedAdmin) {
+            return null;
+        }
+
+        const restoredAdmin = await this.adminRepo.archive(deletedAdmin.id);
+
+        return restoredAdmin;
+
+    }
+
+     // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+     async archiveList(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const query = req.query.query as string || "";
+
+        const skip = (page - 1) * limit;
+
+        const searchDeletedAdmins = await this.adminRepo.archiveList(query, skip, limit);
+        console.log(`Search Deleted Interns: ${searchDeletedAdmins}`);
+        return searchDeletedAdmins;
+
+    }
+
 }
 
 export default AdminService;

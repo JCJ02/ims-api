@@ -119,6 +119,38 @@ class MentorService {
 
     }
 
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const deletedMentor = await this.mentorRepo.deleted(id);
+
+        if(!deletedMentor) {
+            return null;
+        } else {
+
+            const restoredMentor = await this.mentorRepo.archive(deletedMentor.id);
+
+            return restoredMentor;
+
+        }
+
+    }
+
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    async archiveList(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const query = req.query.query as string || "";
+
+        const skip = (page - 1) * limit;
+
+        const searchDeletedMentors = await this.mentorRepo.archiveList(query, skip, limit);
+        console.log(`Search Deleted Interns: ${searchDeletedMentors}`);
+        return searchDeletedMentors;
+
+    }
+
 }
 
 export default MentorService;

@@ -16,6 +16,8 @@ class MentorController {
         this.delete = this.delete.bind(this);
         this.list = this.list.bind(this);
         this.get = this.get.bind(this);
+        this.archive = this.archive.bind(this);
+        this.archiveList = this.archiveList.bind(this);
 
     }
 
@@ -224,6 +226,78 @@ class MentorController {
                 code: 500
             });
         }
+    }
+
+    // ARCHIVE METHOD
+    async archive(req: Request, res: Response) {
+
+        try {
+            
+            const mentorId = Number(req.params.id);
+
+            if(!mentorId) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin Not Found!",
+                    code: 400
+                });
+            } else {
+                const isMentorRestored = await this.mentorService.archive(mentorId);
+
+                if(!isMentorRestored) {
+                    return AppResponse.sendErrors({
+                        res,
+                        data: null,
+                        message: "Failed To Restore!",
+                        code: 403
+                    });
+                } else {
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: isMentorRestored,
+                        message: "Successfully Restored!",
+                        code: 200
+                    });
+                }
+            }
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    async archiveList(req: Request, res: Response) {
+
+        try {
+            
+            const searchResults = await this.mentorService.archiveList(req);
+            console.log(`Searched: ${searchResults}`);
+            return AppResponse.sendSuccessful({
+                res,
+                data: searchResults,
+                message: "Result!",
+                code: 200
+            });
+
+        } catch (error: any) {
+            
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+
+        }
+
     }
 
 }

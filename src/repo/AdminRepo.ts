@@ -45,7 +45,7 @@ class AdminRepo {
     // GET ADMIN ID METHOD
     async show(id: number) {
 
-        const adminId = await prisma.admin.findUnique({
+        const adminId = await prisma.admin.findFirst({
             where: {
                 id: id,
                 deletedAt: null
@@ -70,6 +70,24 @@ class AdminRepo {
         });
 
         return isEmailExist;
+
+    }
+
+    async deleted(id: number) {
+
+        const adminId = await prisma.admin.findFirst({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            },
+            include: {
+                account: true
+            }
+        });
+
+        return adminId;
 
     }
 
@@ -210,6 +228,122 @@ class AdminRepo {
         return {
             admins,
             totalAdmins
+        }
+
+    }
+
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const restoreAdmin = await prisma.admin.update({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            },
+            data: {
+                deletedAt: null,
+                account: {
+                    updateMany: {
+                        where: {
+                            adminId: id,
+                            deletedAt: {
+                                not: null
+                            }
+                        },
+                        data: {
+                            deletedAt: null
+                        }
+                    }
+                }
+            }
+        });
+
+        return restoreAdmin;
+
+    }
+
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    async archiveList(query: string, skip: number, limit: number) {
+
+        const deletedAdmins = await prisma.admin.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalDeletedAdmins = await prisma.admin.count({
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
+
+        return {
+            deletedAdmins,
+            totalDeletedAdmins
         }
 
     }

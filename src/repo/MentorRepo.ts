@@ -49,6 +49,21 @@ class MentorRepo {
 
     }
 
+    async deleted(id: number) {
+
+        const adminId = await prisma.mentor.findFirst({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            }
+        });
+
+        return adminId;
+
+    }
+
     // UPDATE MENTOR METHOD
     async update(id: number, data: mentorType) {
         
@@ -160,6 +175,108 @@ class MentorRepo {
         return {
             mentors,
             totalMentors
+        }
+
+    }
+
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const restoreMentor = await prisma.mentor.update({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            },
+            data: {
+                deletedAt: null,
+            }
+        });
+
+        return restoreMentor;
+
+    }
+
+    // MENTOR ARCHIVE LIST METHOD
+    async archiveList(query: string, skip: number, limit: number) {
+
+        const deletedMentors = await prisma.mentor.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalDeletedMentors = await prisma.mentor.count({
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        firstname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        lastname: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        email: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        role: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
+
+        return {
+            deletedMentors,
+            totalDeletedMentors
         }
 
     }

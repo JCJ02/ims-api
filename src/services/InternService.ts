@@ -262,6 +262,36 @@ class InternService {
 
     }
 
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const deletedIntern = await this.internRepo.deleted(id);
+
+        if(!deletedIntern) {
+            return null;
+        }
+
+        const restoredIntern = await this.internRepo.archive(deletedIntern.id);
+
+        return restoredIntern;
+
+    }
+
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    async archiveList(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const query = req.query.query as string || "";
+
+        const skip = (page - 1) * limit;
+
+        const searchDeletedInterns = await this.internRepo.archiveList(query, skip, limit);
+        console.log(`Search Deleted Interns: ${searchDeletedInterns}`);
+        return searchDeletedInterns;
+
+    }
+
 }
 
 export default InternService;
