@@ -77,7 +77,7 @@ class InternRepo {
 
     async deleted(id: number) {
 
-        const internId = await prisma.intern.findFirst({
+        const intern = await prisma.intern.findFirst({
             where: {
                 id: id,
                 deletedAt: {
@@ -89,7 +89,7 @@ class InternRepo {
             }
         });
 
-        return internId;
+        return intern;
 
     }
 

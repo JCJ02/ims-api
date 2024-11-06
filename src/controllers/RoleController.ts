@@ -15,6 +15,9 @@ class RoleController {
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
         this.list = this.list.bind(this);
+        this.get = this.get.bind(this);
+        this.archive = this.archive.bind(this);
+        this.archiveList = this.archiveList.bind(this);
 
     }
 
@@ -118,7 +121,7 @@ class RoleController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Delete Unsuccessful!",
+                    message: "Failed To Delete!",
                     code: 404
                 });
             } else {
@@ -130,6 +133,40 @@ class RoleController {
                 });
             }
 
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+    }
+
+    // GET ROLE METHOD
+    async get(req: Request, res: Response) {
+        try {
+
+            const role = Number(req.params.id);
+
+            const isRoleExist = await this.roleService.get(role);
+
+            if(!isRoleExist) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Role Not Found!",
+                    code: 403
+                });
+            } else {
+                return AppResponse.sendSuccessful({
+                    res,
+                    data: isRoleExist,
+                    message: "Role Found!",
+                    code: 200
+                });
+            }
+            
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -163,6 +200,80 @@ class RoleController {
             })
 
         }
+    }
+
+    // ARCHIVE METHOD
+    async archive(req: Request, res: Response) {
+
+        try {
+            
+            const roleId = Number(req.params.id);
+
+            if(!roleId) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Role Not Found!",
+                    code: 403
+                });
+            } else {
+
+                const isRoleRestored = await this.roleService.archive(roleId);
+
+                if(!isRoleRestored) {
+                    return AppResponse.sendErrors({
+                        res,
+                        data: null,
+                        message: "Failed To Restore!",
+                        code: 403
+                    });
+                } else {
+                    return AppResponse.sendSuccessful({
+                        res,
+                        data: isRoleRestored,
+                        message: "Sucessfully Restored!",
+                        code: 200
+                    });
+                }
+
+            }
+
+        } catch (error: any) {
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+        }
+
+    }
+
+    // ARCHIVE LIST METHOD
+    async archiveList(req: Request, res: Response) {
+
+        try {
+            
+            const searchResults = await this.roleService.archiveList(req);
+            // console.log(`Searched: ${searchResults}`);
+            return AppResponse.sendSuccessful({
+                res,
+                data: searchResults,
+                message: "Result!",
+                code: 200
+            });
+
+        } catch (error: any) {
+            
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message: error.message,
+                code: 500
+            });
+
+        }
+        
     }
 
 }

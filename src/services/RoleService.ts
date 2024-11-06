@@ -62,7 +62,31 @@ class RoleService {
     // DELETE ROLE METHOD
     async delete(id: number) {
 
-        return await this.roleRepo.delete(id);
+        // return await this.roleRepo.delete(id);
+
+        const role = await this.roleRepo.show(id);
+
+        if(!role) {
+            return null;
+        }
+        else {
+            const deleteRole = await this.roleRepo.delete(role.id);
+
+            return deleteRole;
+        }
+
+    }
+
+    // GET ROLE METHOD
+    async get(id: number) {
+
+        const role = await this.roleRepo.show(id);
+
+        if(!role) {
+            return null;
+        } else {
+            return role;
+        }
 
     }
 
@@ -80,6 +104,38 @@ class RoleService {
 
         return searchResults;
 
+    }
+
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const deletedRole = await this.roleRepo.deleted(id);
+
+        if(!deletedRole) {
+            return null;
+        } else {
+            
+            const restoredRole = await this.roleRepo.archive(deletedRole.id);
+
+            return restoredRole;
+
+        }
+
+    }
+
+    // ARCHIVE LIST METHOD
+    async archiveList(req: Request) {
+
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const query = req.query.query as string || "";
+
+        const skip = (page - 1) * limit;
+
+        const searchDeletedRoles = await this.roleRepo.archiveList(query, skip, limit);
+
+        return searchDeletedRoles;
+        
     }
 
 }
