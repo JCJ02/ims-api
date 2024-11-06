@@ -14,5 +14,7 @@ internRoute.delete("/:id", authMiddleware, internController.delete);
 internRoute.get("/", authMiddleware, internController.list);
 internRoute.get("/:id", authMiddleware, internController.get);
 internRoute.put("/reset-password/:id", authMiddleware, internController.resetPassword);
+internRoute.put("/archive/:id", authMiddleware, internController.archive);
+internRoute.get("/retrieve/archive-list", authMiddleware, internController.archiveList);
 
 export default internRoute;

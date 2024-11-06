@@ -15,5 +15,7 @@ adminRoute.delete("/:id", authMiddleware, adminController.delete);
 adminRoute.post("/send-email", authMiddleware, adminController.sendEmail);
 adminRoute.get("/", authMiddleware, adminController.list);
 adminRoute.get("/:id", authMiddleware, adminController.get);
+adminRoute.put("/archive/:id", authMiddleware, adminController.archive);
+adminRoute.get("/retrieve/archive-list", authMiddleware, adminController.archiveList);
 
 export default adminRoute;
