@@ -51,7 +51,7 @@ class MentorRepo {
 
     async deleted(id: number) {
 
-        const adminId = await prisma.mentor.findFirst({
+        const mentor = await prisma.mentor.findFirst({
             where: {
                 id: id,
                 deletedAt: {
@@ -60,7 +60,7 @@ class MentorRepo {
             }
         });
 
-        return adminId;
+        return mentor;
 
     }
 
