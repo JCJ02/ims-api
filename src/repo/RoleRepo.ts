@@ -17,12 +17,42 @@ class RoleRepo {
 
     }
 
+    // SHOW METHOD
+    async show(id: number) {
+
+        const role = await prisma.role.findFirst({
+            where: {
+                id: id,
+                deletedAt: null
+            }
+        });
+
+        return role;
+
+    }
+
+    async deleted(id: number) {
+
+        const role = await prisma.role.findFirst({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            }
+        });
+
+        return role;
+
+    }
+
     // VALIDATE ROLE ID
     async validateRoleId(id: string) {
 
         const isRoleIdExist = await prisma.role.findFirst({
             where: {
-                roleId: id
+                roleId: id,
+                deletedAt: null
             },
             orderBy: {
               roleId: 'desc',
@@ -64,33 +94,6 @@ class RoleRepo {
         });
 
         return removeRole;
-
-    }
-
-    // GET ROLES w/ PAGINATION METHOD
-    async getRoles(skip: number, limit: number) {
-
-        const roles = await prisma.role.findMany({
-            skip: skip,
-            take: limit,
-            where: {
-                deletedAt: null
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-
-        const totalRoles = await prisma.role.count({
-            where: {
-                deletedAt: null
-            }
-        });
-
-        return {
-            roles,
-            totalRoles,
-        };
 
     }
 
@@ -161,6 +164,96 @@ class RoleRepo {
 
     }
 
+    // ARCHIVE METHOD
+    async archive(id: number) {
+
+        const restoreRole = await prisma.role.update({
+            where: {
+                id: id,
+                deletedAt: {
+                    not: null
+                }
+            },
+            data: {
+                deletedAt: null
+            }
+        });
+
+        return restoreRole;
+
+    }
+
+    // ARCHIVE LIST METHOD
+    async archiveList(query: string, skip: number, limit: number) {
+
+        const deletedRoles = await prisma.role.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        roleId: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleName: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleDescription: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        const totalDeletedRoles = await prisma.role.count({
+            where: {
+                deletedAt: {
+                    not: null
+                },
+                OR: [
+                    {
+                        roleId: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleName: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        roleDescription: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
+
+        return {
+            deletedRoles,
+            totalDeletedRoles,
+        };
+
+    }
+    
 }
 
 export default RoleRepo;
