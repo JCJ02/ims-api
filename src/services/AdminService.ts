@@ -210,7 +210,7 @@ class AdminService {
         const skip = (page - 1) * limit;
 
         const searchDeletedAdmins = await this.adminRepo.archiveList(query, skip, limit);
-        console.log(`Search Deleted Interns: ${searchDeletedAdmins}`);
+        // console.log(`Search Deleted Interns: ${searchDeletedAdmins}`);
         return searchDeletedAdmins;
 
     }

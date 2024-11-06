@@ -75,7 +75,7 @@ class AdminRepo {
 
     async deleted(id: number) {
 
-        const adminId = await prisma.admin.findFirst({
+        const admin = await prisma.admin.findFirst({
             where: {
                 id: id,
                 deletedAt: {
@@ -87,7 +87,7 @@ class AdminRepo {
             }
         });
 
-        return adminId;
+        return admin;
 
     }
 

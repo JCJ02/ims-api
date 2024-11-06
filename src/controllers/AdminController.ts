@@ -463,7 +463,7 @@ class AdminController {
                     res,
                     data: null,
                     message: "Admin Not Found!",
-                    code: 400
+                    code: 403
                 });
             } else {
                 const isAdminRestored = await this.adminService.archive(adminId);
@@ -502,7 +502,7 @@ class AdminController {
         try {
             
             const searchResults = await this.adminService.archiveList(req);
-            console.log(`Searched: ${searchResults}`);
+            // console.log(`Searched: ${searchResults}`);
             return AppResponse.sendSuccessful({
                 res,
                 data: searchResults,
