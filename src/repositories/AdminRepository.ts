@@ -1,36 +1,34 @@
-import prisma from "../utils/client";
-import { internAccountType, internType } from "../types/InternType";
+import { adminAccountType, adminType } from "../types/AdminType";
+import prisma from "../utils/prismaClient";
 
-class InternRepo {
+class AdminRepository {
 
-    // CREATE INTERN METHOD
-    async create(data: internAccountType, prismaTrasaction: any) {
+    // CREATE ADMIN METHOD
+    async create(data: adminAccountType) {
 
-        const newIntern = await prismaTrasaction.intern.create({
-            data: {
-                firstname: data.firstname,
-                lastname: data.lastname,
-                email: data.email,
-                birthdate: data.birthdate,
-                school: data.school,
-                mentor: data.mentor,
-                role: data.role,
-                account: {
-                    create: {
-                        password: data.password,
-                    },
-                },
-            },
+        const newAdmin = await prisma.$transaction(async (prisma) => {
+            return await prisma.admin.create({
+                data: {
+                    firstname: data.firstname,
+                    lastname: data.lastname,
+                    email: data.email,
+                    account: {
+                        create: {
+                            password: data.password
+                        }
+                    }
+                }
+            });
         });
-    
-        return newIntern;
+
+        return newAdmin;
 
     }
 
-    // AUTHENTICATE OR LOG IN INTERN METHOD
-    async authenticate(data: { email: string}) {
-
-        const intern = await prisma.intern.findFirst({
+    // AUTHENTICATE OR LOG IN ADMIN METHOD
+    async authenticate(data: { email: string }) {
+        //console.log("Email: ", data.email);
+        const admin = await prisma.admin.findFirst({
             where: {
                 email: data.email,
                 deletedAt: null
@@ -39,15 +37,15 @@ class InternRepo {
                 account: true
             }
         });
-
-        return intern;
+        //console.log("Admin: ", admin);
+        return admin;
 
     }
 
-    // SHOW METHOD
+    // GET ADMIN ID METHOD
     async show(id: number) {
 
-        const internId = await prisma.intern.findFirst({
+        const adminId = await prisma.admin.findFirst({
             where: {
                 id: id,
                 deletedAt: null
@@ -57,14 +55,14 @@ class InternRepo {
             }
         });
 
-        return internId;
+        return adminId;
 
     }
 
     // VALIDATE EMAIL METHOD
     async validateEmail(email: string) {
 
-        const isEmailExist = await prisma.intern.findFirst({
+        const isEmailExist = await prisma.admin.findFirst({
             where: {
                 email: email,
                 deletedAt: null
@@ -77,7 +75,7 @@ class InternRepo {
 
     async deleted(id: number) {
 
-        const intern = await prisma.intern.findFirst({
+        const admin = await prisma.admin.findFirst({
             where: {
                 id: id,
                 deletedAt: {
@@ -89,14 +87,14 @@ class InternRepo {
             }
         });
 
-        return intern;
+        return admin;
 
     }
 
-    // UPDATE INTERN METHOD
-    async update(id: number, data: internType) {
-        
-        const editIntern = await prisma.intern.update({
+    // UPDATE ADMIN METHOD
+    async update(id: number, data: adminType) {
+
+        const editAdmin = await prisma.admin.update({
             where: {
                 id: id,
                 deletedAt: null
@@ -105,48 +103,43 @@ class InternRepo {
                 firstname: data.firstname,
                 lastname: data.lastname,
                 email: data.email,
-                birthdate: data.birthdate,
-                school: data.school,
-                mentor: data.mentor,
-                role: data.role,
             }
         });
 
-        return editIntern;
+        return editAdmin;
 
     }
 
-    // UPDATE INTERN PASSWORD METHOD
+    // UPDATE ADMIN PASSWORD METHOD
     async updatePassword(id: number, data: { newPassword: string }) {
 
-        const editInternPassword = await prisma.account.update({
+        const editAdminPassword = await prisma.account.update({
             where: {
                 id: id,
                 deletedAt: null
             },
             data: {
-                password: data.newPassword 
+                password: data.newPassword
             }
         });
 
-        return editInternPassword;
+        return editAdminPassword;
 
     }
 
-    // DELETE INTERN METHOD
+    // DELETE ADMIN METHOD
     async delete(id: number) {
-
-        const softDeleteIntern = await prisma.intern.update({
+        const softDeleteAdmin = await prisma.admin.update({
             where: {
                 id: id,
-                deletedAt: null
+                deletedAt: null,
             },
             data: {
                 deletedAt: new Date(),
                 account: {
                     updateMany: {
                         where: {
-                            internId: id,
+                            adminId: id,
                             deletedAt: null
                         },
                         data: {
@@ -154,17 +147,16 @@ class InternRepo {
                         }
                     }
                 }
-            }
+            },
         });
 
-        return softDeleteIntern;
-
+        return softDeleteAdmin;
     }
 
-    // INTERN LIST w/ SEARCH AND PAGINATION METHOD
+    // LIST w/ SEARCH AND PAGINATION METHOD
     async list(query: string, skip: number, limit: number) {
 
-        const interns = await prisma.intern.findMany({
+        const admins = await prisma.admin.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -189,24 +181,11 @@ class InternRepo {
                         }
                     },
                     {
-                        school: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
-                        mentor: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
                         }
                     }
-
                 ]
             },
             orderBy: {
@@ -214,7 +193,7 @@ class InternRepo {
             }
         });
 
-        const totalInterns = await prisma.intern.count({
+        const totalAdmins = await prisma.admin.count({
             where: {
                 deletedAt: null,
                 OR: [
@@ -237,18 +216,6 @@ class InternRepo {
                         }
                     },
                     {
-                        school: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
-                        mentor: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
@@ -259,8 +226,8 @@ class InternRepo {
         });
 
         return {
-            interns,
-            totalInterns
+            admins,
+            totalAdmins
         }
 
     }
@@ -268,7 +235,7 @@ class InternRepo {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const restoreIntern = await prisma.intern.update({
+        const restoreAdmin = await prisma.admin.update({
             where: {
                 id: id,
                 deletedAt: {
@@ -280,7 +247,7 @@ class InternRepo {
                 account: {
                     updateMany: {
                         where: {
-                            internId: id,
+                            adminId: id,
                             deletedAt: {
                                 not: null
                             }
@@ -293,14 +260,14 @@ class InternRepo {
             }
         });
 
-        return restoreIntern;
+        return restoreAdmin;
 
     }
 
     // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
     async archiveList(query: string, skip: number, limit: number) {
 
-        const deletedInterns = await prisma.intern.findMany({
+        const deletedAdmins = await prisma.admin.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -327,18 +294,6 @@ class InternRepo {
                         }
                     },
                     {
-                        school: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
-                        mentor: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
@@ -352,7 +307,7 @@ class InternRepo {
             }
         });
 
-        const totalDeletedInterns = await prisma.intern.count({
+        const totalDeletedAdmins = await prisma.admin.count({
             where: {
                 deletedAt: {
                     not: null
@@ -377,18 +332,6 @@ class InternRepo {
                         }
                     },
                     {
-                        school: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
-                        mentor: {
-                            contains: query,
-                            mode: "insensitive"
-                        }
-                    },
-                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
@@ -399,12 +342,12 @@ class InternRepo {
         });
 
         return {
-            deletedInterns,
-            totalDeletedInterns
+            deletedAdmins,
+            totalDeletedAdmins
         }
 
     }
 
 }
 
-export default InternRepo;
+export default AdminRepository;

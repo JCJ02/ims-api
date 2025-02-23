@@ -1,25 +1,25 @@
-import RoleRepo from "../repo/RoleRepo";
 import { Request } from "express";
+import RoleRepository from "../repositories/RoleRepository";
 
 class RoleService {
 
-    private roleRepo;
+    private roleRepository;
 
     constructor() {
 
-        this.roleRepo = new RoleRepo();
+        this.roleRepository = new RoleRepository();
 
     }
 
     // CREATE ROLE METHOD
     async create(data: any) {
 
-        const lastRoleId = await this.roleRepo.validateRoleId(data.id);
+        const lastRoleId = await this.roleRepository.validateRoleId(data.id);
 
         // GENERATE NEW ROLE ID
         let newRoleId: string;
-        
-        if(lastRoleId) {
+
+        if (lastRoleId) {
 
             const lastNumber = parseInt(lastRoleId.roleId.split('-')[1]);
 
@@ -37,15 +37,15 @@ class RoleService {
             ...data
         }
 
-        const newRole = await this.roleRepo.create(roleData);
-        
+        const newRole = await this.roleRepository.create(roleData);
+
         return newRole;
 
     }
 
     // UPDATE ROLE METHOD
     async update(req: Request, data: any) {
-        
+
         const id = Number(req.params.id);
 
         const roleData = {
@@ -53,7 +53,7 @@ class RoleService {
             ...data
         }
 
-        const editRole = await this.roleRepo.update(roleData);
+        const editRole = await this.roleRepository.update(roleData);
 
         return editRole;
 
@@ -64,13 +64,13 @@ class RoleService {
 
         // return await this.roleRepo.delete(id);
 
-        const role = await this.roleRepo.show(id);
+        const role = await this.roleRepository.show(id);
 
-        if(!role) {
+        if (!role) {
             return null;
         }
         else {
-            const deleteRole = await this.roleRepo.delete(role.id);
+            const deleteRole = await this.roleRepository.delete(role.id);
 
             return deleteRole;
         }
@@ -80,9 +80,9 @@ class RoleService {
     // GET ROLE METHOD
     async get(id: number) {
 
-        const role = await this.roleRepo.show(id);
+        const role = await this.roleRepository.show(id);
 
-        if(!role) {
+        if (!role) {
             return null;
         } else {
             return role;
@@ -100,7 +100,7 @@ class RoleService {
 
         const skip = (page - 1) * limit;
 
-        const searchResults = await this.roleRepo.list(query, skip, limit);
+        const searchResults = await this.roleRepository.list(query, skip, limit);
 
         return searchResults;
 
@@ -109,13 +109,13 @@ class RoleService {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const deletedRole = await this.roleRepo.deleted(id);
+        const deletedRole = await this.roleRepository.deleted(id);
 
-        if(!deletedRole) {
+        if (!deletedRole) {
             return null;
         } else {
-            
-            const restoredRole = await this.roleRepo.archive(deletedRole.id);
+
+            const restoredRole = await this.roleRepository.archive(deletedRole.id);
 
             return restoredRole;
 
@@ -132,10 +132,10 @@ class RoleService {
 
         const skip = (page - 1) * limit;
 
-        const searchDeletedRoles = await this.roleRepo.archiveList(query, skip, limit);
+        const searchDeletedRoles = await this.roleRepository.archiveList(query, skip, limit);
 
         return searchDeletedRoles;
-        
+
     }
 
 }

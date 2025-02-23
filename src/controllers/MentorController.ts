@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import MentorService from "../services/MentorService";
-import AppResponse from "../utils/AppResponse";
-import { mentorSchema } from "../utils/validations/MentorSchema";
+import AppResponse from "../utils/appResponse";
+import { createMentorSchema } from "../utils/zod/MentorSchema";
 
 class MentorController {
 
     private mentorService;
 
     constructor() {
-        
+
         this.mentorService = new MentorService();
 
         this.create = this.create.bind(this);
@@ -23,12 +23,12 @@ class MentorController {
 
     // CREATE MENTOR METHOD
     async create(req: Request, res: Response) {
-        
+
         try {
 
-            const validateMentorData = mentorSchema.safeParse(req.body);
+            const validateMentorData = createMentorSchema.safeParse(req.body);
 
-            if(validateMentorData.error) {
+            if (validateMentorData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -39,7 +39,7 @@ class MentorController {
 
                 const newMentor = await this.mentorService.create(validateMentorData.data);
 
-                if(!newMentor) {
+                if (!newMentor) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -57,7 +57,7 @@ class MentorController {
                 }
 
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -76,9 +76,9 @@ class MentorController {
 
             const mentorId = Number(req.params.id);
 
-            const validatedMentorData = mentorSchema.safeParse(req.body);
+            const validatedMentorData = createMentorSchema.safeParse(req.body);
 
-            if(validatedMentorData.error) {
+            if (validatedMentorData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -88,8 +88,8 @@ class MentorController {
             } else {
 
                 const updatedMentorData = await this.mentorService.update(mentorId, validatedMentorData.data);
-    
-                if(!updatedMentorData) {
+
+                if (!updatedMentorData) {
 
                     return AppResponse.sendErrors({
                         res,
@@ -111,7 +111,7 @@ class MentorController {
 
             }
 
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -130,7 +130,7 @@ class MentorController {
 
             const mentorId = Number(req.params.id);
 
-            if(!mentorId) {
+            if (!mentorId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -141,7 +141,7 @@ class MentorController {
 
                 const isMentorDeleted = await this.mentorService.delete(mentorId);
 
-                if(!isMentorDeleted) {
+                if (!isMentorDeleted) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -158,7 +158,7 @@ class MentorController {
                 }
 
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -174,7 +174,7 @@ class MentorController {
     async list(req: Request, res: Response) {
 
         try {
-        
+
             const searchResults = await this.mentorService.list(req);
 
             return AppResponse.sendSuccessful({
@@ -183,7 +183,7 @@ class MentorController {
                 message: "Result!",
                 code: 200
             });
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -202,7 +202,7 @@ class MentorController {
 
             const isMentorExist = await this.mentorService.show(mentor);
 
-            if(!isMentorExist) {
+            if (!isMentorExist) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -217,7 +217,7 @@ class MentorController {
                     code: 200
                 });
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -232,10 +232,10 @@ class MentorController {
     async archive(req: Request, res: Response) {
 
         try {
-            
+
             const mentorId = Number(req.params.id);
 
-            if(!mentorId) {
+            if (!mentorId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -245,7 +245,7 @@ class MentorController {
             } else {
                 const isMentorRestored = await this.mentorService.archive(mentorId);
 
-                if(!isMentorRestored) {
+                if (!isMentorRestored) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -277,7 +277,7 @@ class MentorController {
     async archiveList(req: Request, res: Response) {
 
         try {
-            
+
             const searchResults = await this.mentorService.archiveList(req);
             console.log(`Searched: ${searchResults}`);
             return AppResponse.sendSuccessful({
@@ -288,7 +288,7 @@ class MentorController {
             });
 
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,

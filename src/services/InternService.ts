@@ -1,28 +1,29 @@
-import InternRepo from "../repo/InternRepo";
+
 import bcrypt from "bcryptjs";
 import { internAccountType, internType } from "../types/InternType";
 import { Request } from "express";
 import { generateToken } from "../utils/token";
-import { sendEmails } from "../utils/sendEmails";
-import prisma from "../utils/client";
+import { sendInternAccountDetails } from "../utils/sendInternAccountDetails";
+import prisma from "../utils/prismaClient";
 import { generatePassword } from "../utils/generatePassword";
+import InternRepository from "../repositories/InternRepository";
 
 class InternService {
 
-    private internRepo;
+    private internRepository;
 
     constructor() {
 
-        this.internRepo = new InternRepo();
+        this.internRepository = new InternRepository();
 
     }
 
     // CREATE INTERN
     async create(data: internAccountType) {
 
-        const isEmailExist = await this.internRepo.validateEmail(data.email);
+        const isEmailExist = await this.internRepository.validateEmail(data.email);
 
-        if(isEmailExist) {
+        if (isEmailExist) {
             return null
         } else {
             const plainPassword = data.password;
@@ -33,13 +34,13 @@ class InternService {
                 password: hashedPassword
             }
 
-            const createdIntern = await prisma.$transaction( async (prismaTrasaction) => {
+            const createdIntern = await prisma.$transaction(async (prismaTrasaction) => {
 
-                const newIntern = await this.internRepo.create(internData, prismaTrasaction);
+                const newIntern = await this.internRepository.create(internData, prismaTrasaction);
 
                 try {
-                        
-                    await sendEmails({
+
+                    await sendInternAccountDetails({
                         to: newIntern.email,
                         subject: `Welcome to the Team, ${newIntern.firstname} ${newIntern.lastname}! Your Intern Account is Ready! 🎉`,
                         message: `
@@ -59,12 +60,12 @@ class InternService {
                             The Lightweight Solutions Team!
                         `
                     });
-                
+
                 } catch (error) {
-                                
+
                     console.error("Failed To Send Email, Rolling Back Transaction: ", error);
                     throw new Error("Email Sending Failed; Rolling Back Transaction");
-                
+
                 }
 
                 return newIntern;
@@ -79,15 +80,15 @@ class InternService {
     // AUTHENTICATE OR LOG IN INTERN METHOD
     async authenticate(data: { email: string, password: string }) {
 
-        const intern = await this.internRepo.authenticate(data);
+        const intern = await this.internRepository.authenticate(data);
 
-        if(!intern) {
+        if (!intern) {
             return null;
         } else {
 
             const isPasswordValid = bcrypt.compareSync(data.password, intern.account[0].password);
 
-            if(!isPasswordValid) {
+            if (!isPasswordValid) {
                 return null;
             } else {
 
@@ -105,9 +106,9 @@ class InternService {
     // SHOW METHOD
     async show(id: number) {
 
-        const intern = await this.internRepo.show(id);
+        const intern = await this.internRepository.show(id);
 
-        if(!intern) {
+        if (!intern) {
             return null;
         }
 
@@ -118,9 +119,9 @@ class InternService {
     // VALIDATE EMAIL METHOD
     async validateEmail(email: string) {
 
-        const emailAddress = await this.internRepo.validateEmail(email);
+        const emailAddress = await this.internRepository.validateEmail(email);
 
-        if(!emailAddress) {
+        if (!emailAddress) {
             return null;
         }
 
@@ -131,15 +132,15 @@ class InternService {
     // UPDATE INTERN METHOD
     async update(id: number, data: internType) {
 
-        const intern = await this.internRepo.show(id);
+        const intern = await this.internRepository.show(id);
 
-        if(!intern) {
+        if (!intern) {
             return null;
         } else {
 
-            if(data.email) {
-                const isEmailExist = await this.internRepo.validateEmail(data.email);
-                if(isEmailExist && isEmailExist.id !== id) {
+            if (data.email) {
+                const isEmailExist = await this.internRepository.validateEmail(data.email);
+                if (isEmailExist && isEmailExist.id !== id) {
                     return null;
                 }
             }
@@ -148,7 +149,7 @@ class InternService {
                 ...data
             }
 
-            const updateInternData = this.internRepo.update(intern.id, internData);
+            const updateInternData = this.internRepository.update(intern.id, internData);
 
             return updateInternData;
 
@@ -157,17 +158,17 @@ class InternService {
     }
 
     // UPDATE INTERN PASSWORD METHOD
-    async updatePassword(id: number, data: { newPassword: string, currentPassword: string}) {
-        
-        const intern = await this.internRepo.show(id);
+    async updatePassword(id: number, data: { newPassword: string, currentPassword: string }) {
 
-        if(!intern) {
+        const intern = await this.internRepository.show(id);
+
+        if (!intern) {
             return null;
         } else {
 
             const isPasswordEqual = bcrypt.compareSync(data.currentPassword, intern.account[0].password);
 
-            if(!isPasswordEqual) {
+            if (!isPasswordEqual) {
 
                 return null;
 
@@ -175,7 +176,7 @@ class InternService {
 
                 const hashedNewPassword = bcrypt.hashSync(data.newPassword, 10);
 
-                const updatedPassword = await this.internRepo.updatePassword(intern.account[0].id, { newPassword: hashedNewPassword });
+                const updatedPassword = await this.internRepository.updatePassword(intern.account[0].id, { newPassword: hashedNewPassword });
 
                 return updatedPassword;
 
@@ -187,14 +188,14 @@ class InternService {
 
     // DELETE INTERN METHOD
     async delete(id: number) {
-        
-        const intern = await this.internRepo.show(id);
 
-        if(!intern) {
+        const intern = await this.internRepository.show(id);
+
+        if (!intern) {
             return null;
         }
 
-        const deletedIntern = await this.internRepo.delete(intern.id);
+        const deletedIntern = await this.internRepository.delete(intern.id);
 
         return deletedIntern;
 
@@ -209,7 +210,7 @@ class InternService {
 
         const skip = (page - 1) * limit;
 
-        const searchInterns = await this.internRepo.list(query, skip, limit);
+        const searchInterns = await this.internRepository.list(query, skip, limit);
 
         return searchInterns;
 
@@ -218,20 +219,20 @@ class InternService {
     // RESET PASSWORD METHOD
     async resetPassword(id: number) {
 
-        const intern = await this.internRepo.show(id);
+        const intern = await this.internRepository.show(id);
 
-        if(!intern) {
+        if (!intern) {
             return null;
         } else {
 
             const newGeneratedPassword = await generatePassword(10);
             const hashedNewPassword = bcrypt.hashSync(newGeneratedPassword, 10);
 
-            const updatedPassword = await this.internRepo.updatePassword(intern.account[0].id, { newPassword: hashedNewPassword });
+            const updatedPassword = await this.internRepository.updatePassword(intern.account[0].id, { newPassword: hashedNewPassword });
 
-            if(updatedPassword) {
+            if (updatedPassword) {
 
-                const sendUpdatedPassword = await sendEmails({
+                const sendUpdatedPassword = await sendInternAccountDetails({
                     to: intern.email,
                     subject: "🎉 Your Password Has Been Reset! 🚀",
                     message: `
@@ -265,13 +266,13 @@ class InternService {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const deletedIntern = await this.internRepo.deleted(id);
+        const deletedIntern = await this.internRepository.deleted(id);
 
-        if(!deletedIntern) {
+        if (!deletedIntern) {
             return null;
         }
 
-        const restoredIntern = await this.internRepo.archive(deletedIntern.id);
+        const restoredIntern = await this.internRepository.archive(deletedIntern.id);
 
         return restoredIntern;
 
@@ -286,7 +287,7 @@ class InternService {
 
         const skip = (page - 1) * limit;
 
-        const searchDeletedInterns = await this.internRepo.archiveList(query, skip, limit);
+        const searchDeletedInterns = await this.internRepository.archiveList(query, skip, limit);
         console.log(`Search Deleted Interns: ${searchDeletedInterns}`);
         return searchDeletedInterns;
 

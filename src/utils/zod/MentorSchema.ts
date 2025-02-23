@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const mentorSchema = z.object({
+const createMentorSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
         invalid_type_error: "Firstname Must Be String!"
@@ -25,5 +25,5 @@ const mentorSchema = z.object({
 });
 
 export {
-    mentorSchema
+    createMentorSchema
 }

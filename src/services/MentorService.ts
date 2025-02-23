@@ -1,32 +1,32 @@
 import { Request } from "express";
-import MentorRepo from "../repo/MentorRepo";
 import { mentorType } from "../types/MentorType";
+import MentorRepository from "../repositories/MentorRepository";
 
 class MentorService {
 
-    private mentorRepo;
+    private mentorRepository;
 
     constructor() {
-        
-        this.mentorRepo = new MentorRepo();
-        
+
+        this.mentorRepository = new MentorRepository();
+
     }
 
     // CREATE MENTOR METHOD
     async create(data: mentorType) {
 
-        const isEmailExist = await this.mentorRepo.validateEmail(data.email);
+        const isEmailExist = await this.mentorRepository.validateEmail(data.email);
 
-        if(isEmailExist) {
+        if (isEmailExist) {
             return null;
         } else {
 
             const mentorData = {
                 ...data
             }
-    
-            const newMentor = await this.mentorRepo.create(mentorData);
-    
+
+            const newMentor = await this.mentorRepository.create(mentorData);
+
             return newMentor;
 
         }
@@ -36,9 +36,9 @@ class MentorService {
     // SHOW METHOD
     async show(id: number) {
 
-        const mentor = await this.mentorRepo.show(id);
+        const mentor = await this.mentorRepository.show(id);
 
-        if(!mentor) {
+        if (!mentor) {
             return null;
         }
 
@@ -49,9 +49,9 @@ class MentorService {
     // VALIDATE EMAIL METHOD
     async validateEmail(email: string) {
 
-        const emailAddress = await this.mentorRepo.validateEmail(email);
+        const emailAddress = await this.mentorRepository.validateEmail(email);
 
-        if(!emailAddress) {
+        if (!emailAddress) {
             return null;
         }
 
@@ -62,15 +62,15 @@ class MentorService {
     // UPDATE MENTOR METHOD
     async update(id: number, data: mentorType) {
 
-        const mentor = await this.mentorRepo.show(id);
+        const mentor = await this.mentorRepository.show(id);
 
-        if(!mentor) {
+        if (!mentor) {
             return null;
         } else {
 
-            if(data.email) {
-                const isEmailExist = await this.mentorRepo.validateEmail(data.email);
-                if(isEmailExist && isEmailExist.id !== id) {
+            if (data.email) {
+                const isEmailExist = await this.mentorRepository.validateEmail(data.email);
+                if (isEmailExist && isEmailExist.id !== id) {
                     return null;
                 }
             }
@@ -79,7 +79,7 @@ class MentorService {
                 ...data
             }
 
-            const updateMentorData = await this.mentorRepo.update(mentor.id, mentorData);
+            const updateMentorData = await this.mentorRepository.update(mentor.id, mentorData);
 
             return updateMentorData;
 
@@ -90,13 +90,13 @@ class MentorService {
     // SOFT DELETE MENTOR METHOD
     async delete(id: number) {
 
-        const mentor = await this.mentorRepo.show(id);
+        const mentor = await this.mentorRepository.show(id);
 
-        if(!mentor) {
+        if (!mentor) {
             return null;
         } else {
 
-            const deleteMentor = await this.mentorRepo.delete(mentor.id);
+            const deleteMentor = await this.mentorRepository.delete(mentor.id);
 
             return deleteMentor;
 
@@ -113,7 +113,7 @@ class MentorService {
 
         const skip = (page - 1) * limit;
 
-        const searchMentors = await this.mentorRepo.list(query, skip, limit);
+        const searchMentors = await this.mentorRepository.list(query, skip, limit);
 
         return searchMentors;
 
@@ -122,13 +122,13 @@ class MentorService {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const deletedMentor = await this.mentorRepo.deleted(id);
+        const deletedMentor = await this.mentorRepository.deleted(id);
 
-        if(!deletedMentor) {
+        if (!deletedMentor) {
             return null;
         } else {
 
-            const restoredMentor = await this.mentorRepo.archive(deletedMentor.id);
+            const restoredMentor = await this.mentorRepository.archive(deletedMentor.id);
 
             return restoredMentor;
 
@@ -145,7 +145,7 @@ class MentorService {
 
         const skip = (page - 1) * limit;
 
-        const searchDeletedMentors = await this.mentorRepo.archiveList(query, skip, limit);
+        const searchDeletedMentors = await this.mentorRepository.archiveList(query, skip, limit);
         console.log(`Search Deleted Interns: ${searchDeletedMentors}`);
         return searchDeletedMentors;
 

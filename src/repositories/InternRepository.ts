@@ -1,44 +1,70 @@
-import { mentorType } from "../types/MentorType";
-import prisma from "../utils/client";
+import prisma from "../utils/prismaClient";
+import { internAccountType, internType } from "../types/InternType";
 
-class MentorRepo {
+class InternRepository {
 
-    // CREATE MENTOR METHOD
-    async create(data: mentorType) {
+    // CREATE INTERN METHOD
+    async create(data: internAccountType, prismaTrasaction: any) {
 
-        const newMentor = await prisma.$transaction( async (prisma) => {
-            return await prisma.mentor.create({
-                data: {
-                    firstname: data.firstname,
-                    lastname: data.lastname,
-                    email: data.email,
-                    role: data.role
-                }
-            });
+        const newIntern = await prismaTrasaction.intern.create({
+            data: {
+                firstname: data.firstname,
+                lastname: data.lastname,
+                email: data.email,
+                birthdate: data.birthdate,
+                school: data.school,
+                mentor: data.mentor,
+                role: data.role,
+                account: {
+                    create: {
+                        password: data.password,
+                    },
+                },
+            },
         });
 
-        return newMentor;
+        return newIntern;
+
+    }
+
+    // AUTHENTICATE OR LOG IN INTERN METHOD
+    async authenticate(data: { email: string }) {
+
+        const intern = await prisma.intern.findFirst({
+            where: {
+                email: data.email,
+                deletedAt: null
+            },
+            include: {
+                account: true
+            }
+        });
+
+        return intern;
 
     }
 
     // SHOW METHOD
     async show(id: number) {
 
-        const mentorId = await prisma.mentor.findFirst({
+        const internId = await prisma.intern.findFirst({
             where: {
                 id: id,
                 deletedAt: null
+            },
+            include: {
+                account: true
             }
         });
 
-        return mentorId;
+        return internId;
 
     }
 
     // VALIDATE EMAIL METHOD
     async validateEmail(email: string) {
 
-        const isEmailExist = await prisma.mentor.findFirst({
+        const isEmailExist = await prisma.intern.findFirst({
             where: {
                 email: email,
                 deletedAt: null
@@ -51,59 +77,94 @@ class MentorRepo {
 
     async deleted(id: number) {
 
-        const mentor = await prisma.mentor.findFirst({
+        const intern = await prisma.intern.findFirst({
             where: {
                 id: id,
                 deletedAt: {
                     not: null
                 }
-            }
-        });
-
-        return mentor;
-
-    }
-
-    // UPDATE MENTOR METHOD
-    async update(id: number, data: mentorType) {
-        
-        const updateMentorData = await prisma.mentor.update({
-            where: {
-                id: id
             },
-            data: {
-                firstname: data.firstname,
-                lastname: data.lastname,
-                email: data.email,
-                role: data.role
+            include: {
+                account: true
             }
         });
 
-        return updateMentorData;
+        return intern;
 
     }
 
-    // SOFT DELETE MENTOR METHOD
-    async delete(id: number) {
+    // UPDATE INTERN METHOD
+    async update(id: number, data: internType) {
 
-        const softDeleteMentor = await prisma.mentor.update({
+        const editIntern = await prisma.intern.update({
             where: {
                 id: id,
                 deletedAt: null
             },
             data: {
-                deletedAt: new Date()
+                firstname: data.firstname,
+                lastname: data.lastname,
+                email: data.email,
+                birthdate: data.birthdate,
+                school: data.school,
+                mentor: data.mentor,
+                role: data.role,
             }
         });
 
-        return softDeleteMentor;
+        return editIntern;
 
     }
 
-    // MENTOR LIST w/ SEARCH AND PAGINATION METHOD
+    // UPDATE INTERN PASSWORD METHOD
+    async updatePassword(id: number, data: { newPassword: string }) {
+
+        const editInternPassword = await prisma.account.update({
+            where: {
+                id: id,
+                deletedAt: null
+            },
+            data: {
+                password: data.newPassword
+            }
+        });
+
+        return editInternPassword;
+
+    }
+
+    // DELETE INTERN METHOD
+    async delete(id: number) {
+
+        const softDeleteIntern = await prisma.intern.update({
+            where: {
+                id: id,
+                deletedAt: null
+            },
+            data: {
+                deletedAt: new Date(),
+                account: {
+                    updateMany: {
+                        where: {
+                            internId: id,
+                            deletedAt: null
+                        },
+                        data: {
+                            deletedAt: new Date()
+                        }
+                    }
+                }
+            }
+        });
+
+        return softDeleteIntern;
+
+    }
+
+    // INTERN LIST w/ SEARCH AND PAGINATION METHOD
     async list(query: string, skip: number, limit: number) {
 
-        const mentors = await prisma.mentor.findMany({
+        const interns = await prisma.intern.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -128,11 +189,24 @@ class MentorRepo {
                         }
                     },
                     {
+                        school: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        mentor: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
                         }
                     }
+
                 ]
             },
             orderBy: {
@@ -140,7 +214,7 @@ class MentorRepo {
             }
         });
 
-        const totalMentors = await prisma.mentor.count({
+        const totalInterns = await prisma.intern.count({
             where: {
                 deletedAt: null,
                 OR: [
@@ -163,6 +237,18 @@ class MentorRepo {
                         }
                     },
                     {
+                        school: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        mentor: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
@@ -173,8 +259,8 @@ class MentorRepo {
         });
 
         return {
-            mentors,
-            totalMentors
+            interns,
+            totalInterns
         }
 
     }
@@ -182,7 +268,7 @@ class MentorRepo {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const restoreMentor = await prisma.mentor.update({
+        const restoreIntern = await prisma.intern.update({
             where: {
                 id: id,
                 deletedAt: {
@@ -191,17 +277,30 @@ class MentorRepo {
             },
             data: {
                 deletedAt: null,
+                account: {
+                    updateMany: {
+                        where: {
+                            internId: id,
+                            deletedAt: {
+                                not: null
+                            }
+                        },
+                        data: {
+                            deletedAt: null
+                        }
+                    }
+                }
             }
         });
 
-        return restoreMentor;
+        return restoreIntern;
 
     }
 
-    // MENTOR ARCHIVE LIST METHOD
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
     async archiveList(query: string, skip: number, limit: number) {
 
-        const deletedMentors = await prisma.mentor.findMany({
+        const deletedInterns = await prisma.intern.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -228,11 +327,24 @@ class MentorRepo {
                         }
                     },
                     {
+                        school: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        mentor: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
                         }
                     }
+
                 ]
             },
             orderBy: {
@@ -240,7 +352,7 @@ class MentorRepo {
             }
         });
 
-        const totalDeletedMentors = await prisma.mentor.count({
+        const totalDeletedInterns = await prisma.intern.count({
             where: {
                 deletedAt: {
                     not: null
@@ -265,6 +377,18 @@ class MentorRepo {
                         }
                     },
                     {
+                        school: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        mentor: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
                         role: {
                             contains: query,
                             mode: "insensitive"
@@ -275,12 +399,12 @@ class MentorRepo {
         });
 
         return {
-            deletedMentors,
-            totalDeletedMentors
+            deletedInterns,
+            totalDeletedInterns
         }
 
     }
 
 }
 
-export default MentorRepo;
+export default InternRepository;

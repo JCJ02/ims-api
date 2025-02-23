@@ -1,22 +1,23 @@
-import AdminRepo from "../repo/AdminRepo";
+
+import AdminRepository from "../repositories/AdminRepository";
 import { adminAccountType, adminType } from "../types/AdminType";
-import { sendEmails } from "../utils/sendEmails";
+import { sendEmails } from "../utils/sendInternAccountDetails";
 import { generateToken } from "../utils/token";
 import bcrypt from "bcryptjs";
 import { Request } from "express";
 
 class AdminService {
 
-    private adminRepo;
+    private adminRepository;
 
     constructor() {
-        this.adminRepo = new AdminRepo();
+        this.adminRepository = new AdminRepository();
     }
 
     // CREATE ADMIN METHOD
     async create(data: adminAccountType) {
 
-        const isEmailExist = await this.adminRepo.validateEmail(data.email);
+        const isEmailExist = await this.adminRepository.validateEmail(data.email);
 
         if (isEmailExist) {
             return null;
@@ -30,7 +31,7 @@ class AdminService {
             };
             //console.log(hashedPassword);
 
-            const newAdmin = await this.adminRepo.create(adminData);
+            const newAdmin = await this.adminRepository.create(adminData);
 
             return newAdmin;
 
@@ -40,7 +41,7 @@ class AdminService {
     // AUTHENTICATE OR LOG IN ADMIN METHOD
     async authenticate(data: { email: string, password: string }) {
 
-        const admin = await this.adminRepo.authenticate(data);
+        const admin = await this.adminRepository.authenticate(data);
         // console.log("Admin Data: ",admin);
         if (!admin) {
             return null;
@@ -64,7 +65,7 @@ class AdminService {
     // SHOW METHOD
     async show(id: number) {
 
-        const admin = await this.adminRepo.show(id);
+        const admin = await this.adminRepository.show(id);
 
         if (!admin) {
             return null;
@@ -77,7 +78,7 @@ class AdminService {
     // VALIDATE EMAIL METHOD
     async validateEmail(email: string) {
 
-        const emailAddress = await this.adminRepo.validateEmail(email);
+        const emailAddress = await this.adminRepository.validateEmail(email);
 
         if (!emailAddress) {
             return null;
@@ -90,7 +91,7 @@ class AdminService {
     // UPDATE ADMIN METHOD
     async update(id: number, data: adminType) {
 
-        const admin = await this.adminRepo.show(id);
+        const admin = await this.adminRepository.show(id);
         console.log(`Admin ID: ${admin}`);
 
         if (!admin) {
@@ -98,7 +99,7 @@ class AdminService {
         } else {
 
             if (data.email) {
-                const emailExist = await this.adminRepo.validateEmail(data.email);
+                const emailExist = await this.adminRepository.validateEmail(data.email);
                 if (emailExist && emailExist.id !== id) {
                     return null;
                 }
@@ -108,7 +109,7 @@ class AdminService {
                 ...data
             }
 
-            const updateAdminData = await this.adminRepo.update(admin.id, adminData);
+            const updateAdminData = await this.adminRepository.update(admin.id, adminData);
             console.log(`Update Admin Data: ${updateAdminData}`);
 
             return updateAdminData;
@@ -120,7 +121,7 @@ class AdminService {
     // UPDATE ADMIN PASSWORD METHOD
     async updatePassword(id: number, data: { currentPassword: string, newPassword: string }) {
 
-        const admin = await this.adminRepo.show(id);
+        const admin = await this.adminRepository.show(id);
 
         if (!admin) {
             return null;
@@ -136,7 +137,7 @@ class AdminService {
 
         const hashedNewPassword = bcrypt.hashSync(data.newPassword, 10);
 
-        const updatedPassword = await this.adminRepo.updatePassword(admin.account[0].id, { newPassword: hashedNewPassword });
+        const updatedPassword = await this.adminRepository.updatePassword(admin.account[0].id, { newPassword: hashedNewPassword });
 
         return updatedPassword;
 
@@ -145,13 +146,13 @@ class AdminService {
     // DELETE ADMIN METHOD
     async delete(id: number) {
 
-        const admin = await this.adminRepo.show(id);
+        const admin = await this.adminRepository.show(id);
         // console.log(Admin: ${admin});
         if (!admin) {
             return null;
         }
 
-        const deletedAdmin = await this.adminRepo.delete(admin.id);
+        const deletedAdmin = await this.adminRepository.delete(admin.id);
         // console.log(ID: ${deletedAdmin});
         return deletedAdmin;
 
@@ -179,7 +180,7 @@ class AdminService {
 
         const skip = (page - 1) * limit;
 
-        const searchAdmins = await this.adminRepo.list(query, skip, limit);
+        const searchAdmins = await this.adminRepository.list(query, skip, limit);
 
         return searchAdmins;
 
@@ -188,20 +189,20 @@ class AdminService {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const deletedAdmin = await this.adminRepo.deleted(id);
+        const deletedAdmin = await this.adminRepository.deleted(id);
 
-        if(!deletedAdmin) {
+        if (!deletedAdmin) {
             return null;
         }
 
-        const restoredAdmin = await this.adminRepo.archive(deletedAdmin.id);
+        const restoredAdmin = await this.adminRepository.archive(deletedAdmin.id);
 
         return restoredAdmin;
 
     }
 
-     // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
-     async archiveList(req: Request) {
+    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    async archiveList(req: Request) {
 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
@@ -209,7 +210,7 @@ class AdminService {
 
         const skip = (page - 1) * limit;
 
-        const searchDeletedAdmins = await this.adminRepo.archiveList(query, skip, limit);
+        const searchDeletedAdmins = await this.adminRepository.archiveList(query, skip, limit);
         // console.log(`Search Deleted Interns: ${searchDeletedAdmins}`);
         return searchDeletedAdmins;
 

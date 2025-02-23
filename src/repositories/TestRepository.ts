@@ -1,4 +1,4 @@
-class TestRepo {
+class TestRepository {
 
     async index(data: { message: string }) {
 
@@ -9,4 +9,4 @@ class TestRepo {
 
 }
 
-export default TestRepo;
+export default TestRepository;

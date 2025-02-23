@@ -1,4 +1,4 @@
-import prisma from "./utils/client";
+import prisma from "./utils/prismaClient";
 import bcrypt from "bcryptjs";
 
 // CREATE ADMIN METHOD

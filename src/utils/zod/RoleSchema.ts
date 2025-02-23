@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const roleSchema = z.object({
+const createRoleSchema = z.object({
     roleName: z.string({
         required_error: "Role Name Is Required!",
         invalid_type_error: "Role Name Must Be String!"
@@ -16,5 +16,5 @@ const roleSchema = z.object({
 });
 
 export {
-    roleSchema
+    createRoleSchema
 }

@@ -1,10 +1,10 @@
-import prisma from "../utils/client";
+import prisma from "../utils/prismaClient";
 
-class RoleRepo {
+class RoleRepository {
 
     // CREATE ROLE METHOD
     async create(data: any) {
-        
+
         const newRole = await prisma.role.create({
             data: {
                 roleId: data.roleId,
@@ -55,7 +55,7 @@ class RoleRepo {
                 deletedAt: null
             },
             orderBy: {
-              roleId: 'desc',
+                roleId: 'desc',
             },
         });
 
@@ -88,7 +88,7 @@ class RoleRepo {
                 id: id,
                 deletedAt: null
             },
-            data:  {
+            data: {
                 deletedAt: new Date()
             }
         });
@@ -253,7 +253,7 @@ class RoleRepo {
         };
 
     }
-    
+
 }
 
-export default RoleRepo;
+export default RoleRepository;

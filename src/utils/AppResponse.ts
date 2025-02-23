@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-type appResponseParams = {
+type AppResponseParams = {
     res: Response,
     message?: string,
     data: unknown,
@@ -8,7 +8,7 @@ type appResponseParams = {
 }
 
 class AppResponse {
-    static sendSuccessful({ res, message, data, code }: appResponseParams): void {
+    static sendSuccessful({ res, message, data, code }: AppResponseParams): void {
         res.status(code).json({
             data,
             message,
@@ -16,7 +16,7 @@ class AppResponse {
         });
     }
 
-    static sendErrors({ res, message, data, code }: appResponseParams): void {
+    static sendErrors({ res, message, data, code }: AppResponseParams): void {
 
         let returnMessage;
 

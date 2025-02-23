@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import InternService from "../services/InternService";
-import { authInternSchema, internSchema, updateInternSchema } from "../utils/validations/InternSchema";
-import AppResponse from "../utils/AppResponse";
-import { updateAdminPasswordSchema } from "../utils/validations/AdminSchema";
-import { authMiddlewareRequest } from "../types/AuthMiddlewareType";
+import { authenticateInternSchema, createInternSchema, updateInternSchema } from "../utils/zod/InternSchema";
+import AppResponse from "../utils/appResponse";
+import { updateAdminPasswordSchema } from "../utils/zod/AdminSchema";
+import { authenticationMiddlewareRequest } from "../types/AuthenticationMiddlewareType";
 
 class InternController {
 
@@ -12,8 +12,8 @@ class InternController {
     constructor() {
 
         this.internService = new InternService();
-        
-        this.dashboard = this.dashboard.bind(this);
+
+        this.index = this.index.bind(this);
         this.create = this.create.bind(this);
         this.authenticate = this.authenticate.bind(this);
         this.update = this.update.bind(this);
@@ -27,10 +27,10 @@ class InternController {
 
     }
 
-    async dashboard(req: authMiddlewareRequest, res: Response) {
+    async index(req: authenticationMiddlewareRequest, res: Response) {
         try {
             const intern = req.user;
-            if(!intern) {
+            if (!intern) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -66,9 +66,9 @@ class InternController {
 
         try {
 
-            const validateInternData = internSchema.safeParse(req.body);
+            const validateInternData = createInternSchema.safeParse(req.body);
 
-            if(validateInternData.error) {
+            if (validateInternData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -79,7 +79,7 @@ class InternController {
 
                 const newIntern = await this.internService.create(validateInternData.data);
 
-                if(!newIntern) {
+                if (!newIntern) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -115,9 +115,9 @@ class InternController {
 
         try {
 
-            const validation = authInternSchema.safeParse(req.body);
+            const validation = authenticateInternSchema.safeParse(req.body);
 
-            if(validation.error) {
+            if (validation.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -128,7 +128,7 @@ class InternController {
 
                 const result = await this.internService.authenticate(validation.data);
 
-                if(!result) {
+                if (!result) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -145,7 +145,7 @@ class InternController {
                 }
 
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -159,14 +159,14 @@ class InternController {
 
     // UPDATE INTERN METHOD
     async update(req: Request, res: Response) {
-        
+
         try {
 
             const internId = Number(req.params.id);
 
             const validateInternData = updateInternSchema.safeParse(req.body);
 
-            if(validateInternData.error) {
+            if (validateInternData.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -177,7 +177,7 @@ class InternController {
 
                 const updateInternData = await this.internService.update(internId, validateInternData.data);
 
-                if(!updateInternData) {
+                if (!updateInternData) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -196,7 +196,7 @@ class InternController {
                 }
 
             }
-            
+
         } catch (error: any) {
             //console.error("Update error:", error);
             return AppResponse.sendErrors({
@@ -211,14 +211,14 @@ class InternController {
 
     // UPDATE INTERN PASSWORD METHOD
     async updatePassword(req: Request, res: Response) {
-        
+
         try {
-            
+
             const internId = Number(req.params.id);
 
             const validatePasswords = updateAdminPasswordSchema.safeParse(req.body);
 
-            if(validatePasswords.error) {
+            if (validatePasswords.error) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -229,7 +229,7 @@ class InternController {
 
                 const updatedPassword = await this.internService.updatePassword(internId, validatePasswords.data);
 
-                if(!updatedPassword) {
+                if (!updatedPassword) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -260,12 +260,12 @@ class InternController {
 
     // DELETE INTERN METHOD
     async delete(req: Request, res: Response) {
-        
+
         try {
-            
+
             const internId = Number(req.params.id);
 
-            if(!internId) {
+            if (!internId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -275,7 +275,7 @@ class InternController {
             } else {
                 const isInternDeleted = await this.internService.delete(internId);
 
-                if(!isInternDeleted) {
+                if (!isInternDeleted) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -307,7 +307,7 @@ class InternController {
     async list(req: Request, res: Response) {
 
         try {
-            
+
             const searchResults = await this.internService.list(req);
 
             return AppResponse.sendSuccessful({
@@ -318,7 +318,7 @@ class InternController {
             });
 
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -339,7 +339,7 @@ class InternController {
 
             // console.log(`Intern Data: ${isInternExist}`);
 
-            if(!isInternExist) {
+            if (!isInternExist) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -355,7 +355,7 @@ class InternController {
                 });
             }
 
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -375,7 +375,7 @@ class InternController {
 
             const isPasswordUpdated = await this.internService.resetPassword(internId);
 
-            if(!isPasswordUpdated) {
+            if (!isPasswordUpdated) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -390,9 +390,9 @@ class InternController {
                     code: 200
                 });
             }
-            
+
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -408,10 +408,10 @@ class InternController {
     async archive(req: Request, res: Response) {
 
         try {
-            
+
             const interdId = Number(req.params.id);
 
-            if(!interdId) {
+            if (!interdId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -421,7 +421,7 @@ class InternController {
             } else {
                 const isInternRestored = await this.internService.archive(interdId);
 
-                if(!isInternRestored) {
+                if (!isInternRestored) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -453,7 +453,7 @@ class InternController {
     async archiveList(req: Request, res: Response) {
 
         try {
-            
+
             const searchResults = await this.internService.archiveList(req);
             console.log(`Searched: ${searchResults}`);
             return AppResponse.sendSuccessful({
@@ -464,7 +464,7 @@ class InternController {
             });
 
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,

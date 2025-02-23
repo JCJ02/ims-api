@@ -1,6 +1,6 @@
 import RoleService from "../services/RoleService";
-import AppResponse from "../utils/AppResponse";
-import { roleSchema } from "../utils/validations/RoleSchema";
+import AppResponse from "../utils/appResponse";
+import { createRoleSchema } from "../utils/zod/RoleSchema";
 import { Request, Response } from "express";
 
 class RoleController {
@@ -25,9 +25,9 @@ class RoleController {
     async create(req: Request, res: Response) {
         try {
 
-            const validateRoleData = roleSchema.safeParse(req.body);
+            const validateRoleData = createRoleSchema.safeParse(req.body);
 
-            if(validateRoleData.error) {
+            if (validateRoleData.error) {
 
                 return AppResponse.sendErrors({
                     res,
@@ -66,9 +66,9 @@ class RoleController {
     async update(req: Request, res: Response) {
         try {
 
-            const validateRoleData = roleSchema.safeParse(req.body);
+            const validateRoleData = createRoleSchema.safeParse(req.body);
 
-            if(validateRoleData.error) {
+            if (validateRoleData.error) {
 
                 return AppResponse.sendErrors({
                     res,
@@ -80,7 +80,7 @@ class RoleController {
             } else {
                 const editedRole = await this.roleService.update(req, validateRoleData.data);
 
-                if(!editedRole) {
+                if (!editedRole) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -96,9 +96,9 @@ class RoleController {
                     });
                 }
             }
-            
+
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -117,7 +117,7 @@ class RoleController {
 
             const isRoleExist = await this.roleService.delete(id);
 
-            if(!isRoleExist) {
+            if (!isRoleExist) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -151,7 +151,7 @@ class RoleController {
 
             const isRoleExist = await this.roleService.get(role);
 
-            if(!isRoleExist) {
+            if (!isRoleExist) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -166,7 +166,7 @@ class RoleController {
                     code: 200
                 });
             }
-            
+
         } catch (error: any) {
             return AppResponse.sendErrors({
                 res,
@@ -189,9 +189,9 @@ class RoleController {
                 message: "Result!",
                 code: 200
             })
-            
+
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -206,10 +206,10 @@ class RoleController {
     async archive(req: Request, res: Response) {
 
         try {
-            
+
             const roleId = Number(req.params.id);
 
-            if(!roleId) {
+            if (!roleId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -220,7 +220,7 @@ class RoleController {
 
                 const isRoleRestored = await this.roleService.archive(roleId);
 
-                if(!isRoleRestored) {
+                if (!isRoleRestored) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -253,7 +253,7 @@ class RoleController {
     async archiveList(req: Request, res: Response) {
 
         try {
-            
+
             const searchResults = await this.roleService.archiveList(req);
             // console.log(`Searched: ${searchResults}`);
             return AppResponse.sendSuccessful({
@@ -264,7 +264,7 @@ class RoleController {
             });
 
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -273,7 +273,7 @@ class RoleController {
             });
 
         }
-        
+
     }
 
 }

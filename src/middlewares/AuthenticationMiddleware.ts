@@ -1,13 +1,13 @@
 import { Response, NextFunction } from "express";
-import AppResponse from "../utils/AppResponse";
+import AppResponse from "../utils/appResponse";
 import { verifyToken } from "../utils/token";
 import { JsonWebTokenError } from "jsonwebtoken";
 import AdminService from "../services/AdminService";
 import InternService from "../services/InternService";
-import { authMiddlewareRequest } from "../types/AuthMiddlewareType";
+import { authenticationMiddlewareRequest } from "../types/AuthenticationMiddlewareType";
 
-const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: NextFunction) => {
-    
+const authenticationMiddleware = async (req: authenticationMiddlewareRequest, res: Response, next: NextFunction) => {
+
     try {
 
         const adminService = new AdminService();
@@ -16,7 +16,7 @@ const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: N
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return AppResponse.sendErrors({ 
+            return AppResponse.sendErrors({
                 res,
                 data: null,
                 message: "No Token Provided!",
@@ -29,11 +29,11 @@ const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: N
 
         let user;
 
-        if(verifiedToken.role === "Admin") {
+        if (verifiedToken.role === "Admin") {
 
             user = await adminService.show(verifiedToken.id);
             //console.log(admin);
-            if(!user) {
+            if (!user) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -42,11 +42,11 @@ const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: N
                 });
             }
 
-        } else if(verifiedToken.role !== "Admin") {
+        } else if (verifiedToken.role !== "Admin") {
 
             user = await internService.show(verifiedToken.id);
 
-            if(!user) {
+            if (!user) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -70,7 +70,7 @@ const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: N
 
     } catch (error: any) {
 
-        if(error instanceof JsonWebTokenError) {
+        if (error instanceof JsonWebTokenError) {
             return AppResponse.sendErrors({
                 res,
                 data: null,
@@ -91,4 +91,4 @@ const authMiddleware = async (req: authMiddlewareRequest, res: Response, next: N
 
 }
 
-export default authMiddleware;
+export default authenticationMiddleware;

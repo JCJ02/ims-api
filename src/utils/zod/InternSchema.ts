@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const adminSchema = z.object({
+const createInternSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
         invalid_type_error: "Firstname Must Be String!"
@@ -8,14 +8,33 @@ const adminSchema = z.object({
         .min(3, "Firstname Must Be At Least 3 Characters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
     lastname: z.string({
-        required_error: "Lastname Is Required!",
-        invalid_type_error: "Lastname Must Be String!"
+        required_error: "Firstname Is Required!",
+        invalid_type_error: "Firstname Must Be String!"
     })
-        .min(3, "Lastname Must Be At Least 3 Characters Long!")
-        .max(255, "Lastname Must Not Exceed 255 Characters!"),
+        .min(3, "Firstname Must Be At Least 3 Charaters Long!")
+        .max(255, "Firstname Must Not Exceed 255 Characters!"),
     email: z.string({
         required_error: "E-mail Is Required!"
-    }).email("Must Be A Valid E-mail!"),
+    }).email("Must Be A Valid Email!"),
+    birthdate: z.coerce.date(),
+    school: z.string({
+        required_error: "School Is Required!",
+        invalid_type_error: "School Must Be String!"
+    })
+        .min(3, "School Must Be At Least 3 Characters Long!")
+        .max(255, "School Must Not Exceed 255 Characters!"),
+    mentor: z.string({
+        required_error: "Mentor Is Required!",
+        invalid_type_error: "Mentor Must Be String!"
+    })
+        .min(3, "Mentor Must Be At Least 3 Characters Long!")
+        .max(255, "Mentor Must Not Exceed 255 Characters!"),
+    role: z.string({
+        required_error: "Role Is Required!",
+        invalid_type_error: "Role Must Be String!"
+    })
+        .min(3, "Role Must Be At Least 3 Characters Long!")
+        .max(255, "Role Must Not Exceed 255 Characters!"),
     password: z.string()
         .min(8, "Password Must Be At Least 8 Characters Long!")
         .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])/, "Password Must Containt At Least One Number And One Special Character!"),
@@ -25,7 +44,7 @@ const adminSchema = z.object({
     message: "Password And Confirm Password Are Not Match!",
 });
 
-const updateAdminSchema = z.object({
+const updateInternSchema = z.object({
     firstname: z.string({
         required_error: "Firstname Is Required!",
         invalid_type_error: "Firstname Must Be String!"
@@ -33,7 +52,7 @@ const updateAdminSchema = z.object({
         .min(3, "Firstname Must Be At Least 3 Characters Long!")
         .max(255, "Firstname Must Not Exceed 255 Characters!"),
     lastname: z.string({
-        required_error: "Lastname Is Required!",
+        required_error: "Firstname Is Required!",
         invalid_type_error: "Firstname Must Be String!"
     })
         .min(3, "Firstname Must Be At Least 3 Charaters Long!")
@@ -41,9 +60,28 @@ const updateAdminSchema = z.object({
     email: z.string({
         required_error: "E-mail Is Required!"
     }).email("Must Be A Valid Email!"),
+    birthdate: z.coerce.date(),
+    school: z.string({
+        required_error: "School Is Required!",
+        invalid_type_error: "School Must Be String!"
+    })
+        .min(3, "School Must Be At Least 3 Characters Long!")
+        .max(255, "School Must Not Exceed 255 Characters!"),
+    mentor: z.string({
+        required_error: "Mentor Is Required!",
+        invalid_type_error: "Mentor Must Be String!"
+    })
+        .min(3, "Mentor Must Be At Least 3 Characters Long!")
+        .max(255, "Mentor Must Not Exceed 255 Characters!"),
+    role: z.string({
+        required_error: "Role Is Required!",
+        invalid_type_error: "Role Must Be String!"
+    })
+        .min(3, "Role Must Be At Least 3 Characters Long!")
+        .max(255, "Role Must Not Exceed 255 Characters!")
 });
 
-const updateAdminPasswordSchema = z.object({
+const updateInternPasswordSchema = z.object({
     currentPassword: z.string()
         .min(8, "Password Must Be At Least 8 Characters Long!")
         .regex(/^(?=.*[0-9])(?=.*[!@#$%^&*])/, "Password Must Containt At Least One Number And One Special Character!"),
@@ -56,7 +94,7 @@ const updateAdminPasswordSchema = z.object({
     path: ["confirmPassword"],
 });
 
-const authAdminSchema = z.object({
+const authenticateInternSchema = z.object({
     email: z.string({
         required_error: "E-mail Is Required!"
     }).email("Must Be A Valid Email!"),
@@ -66,8 +104,8 @@ const authAdminSchema = z.object({
 });
 
 export {
-    adminSchema,
-    updateAdminSchema,
-    updateAdminPasswordSchema,
-    authAdminSchema
+    createInternSchema,
+    updateInternSchema,
+    updateInternPasswordSchema,
+    authenticateInternSchema
 }

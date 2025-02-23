@@ -1,68 +1,44 @@
-import { adminAccountType, adminType } from "../types/AdminType";
-import prisma from "../utils/client";
+import { mentorType } from "../types/MentorType";
+import prisma from "../utils/prismaClient";
 
-class AdminRepo {
+class MentorRepository {
 
-    // CREATE ADMIN METHOD
-    async create(data: adminAccountType) {
+    // CREATE MENTOR METHOD
+    async create(data: mentorType) {
 
-        const newAdmin = await prisma.$transaction(async (prisma) => {
-            return await prisma.admin.create({
+        const newMentor = await prisma.$transaction(async (prisma) => {
+            return await prisma.mentor.create({
                 data: {
                     firstname: data.firstname,
                     lastname: data.lastname,
                     email: data.email,
-                    account: {
-                        create: {
-                            password: data.password
-                        }
-                    }
+                    role: data.role
                 }
             });
         });
 
-        return newAdmin;
+        return newMentor;
 
     }
 
-    // AUTHENTICATE OR LOG IN ADMIN METHOD
-    async authenticate(data: { email: string }) {
-        //console.log("Email: ", data.email);
-        const admin = await prisma.admin.findFirst({
-            where: {
-                email: data.email,
-                deletedAt: null
-            },
-            include: {
-                account: true
-            }
-        });
-        //console.log("Admin: ", admin);
-        return admin;
-
-    }
-
-    // GET ADMIN ID METHOD
+    // SHOW METHOD
     async show(id: number) {
 
-        const adminId = await prisma.admin.findFirst({
+        const mentorId = await prisma.mentor.findFirst({
             where: {
                 id: id,
                 deletedAt: null
-            },
-            include: {
-                account: true
             }
         });
 
-        return adminId;
+        return mentorId;
 
     }
 
     // VALIDATE EMAIL METHOD
     async validateEmail(email: string) {
 
-        const isEmailExist = await prisma.admin.findFirst({
+        const isEmailExist = await prisma.mentor.findFirst({
             where: {
                 email: email,
                 deletedAt: null
@@ -75,88 +51,59 @@ class AdminRepo {
 
     async deleted(id: number) {
 
-        const admin = await prisma.admin.findFirst({
+        const mentor = await prisma.mentor.findFirst({
             where: {
                 id: id,
                 deletedAt: {
                     not: null
                 }
-            },
-            include: {
-                account: true
             }
         });
 
-        return admin;
+        return mentor;
 
     }
 
-    // UPDATE ADMIN METHOD
-    async update(id: number, data: adminType) {
+    // UPDATE MENTOR METHOD
+    async update(id: number, data: mentorType) {
 
-        const editAdmin = await prisma.admin.update({
+        const updateMentorData = await prisma.mentor.update({
             where: {
-                id: id,
-                deletedAt: null
+                id: id
             },
             data: {
                 firstname: data.firstname,
                 lastname: data.lastname,
                 email: data.email,
+                role: data.role
             }
         });
 
-        return editAdmin;
+        return updateMentorData;
 
     }
 
-    // UPDATE ADMIN PASSWORD METHOD
-    async updatePassword(id: number, data: { newPassword: string }) {
+    // SOFT DELETE MENTOR METHOD
+    async delete(id: number) {
 
-        const editAdminPassword = await prisma.account.update({
+        const softDeleteMentor = await prisma.mentor.update({
             where: {
                 id: id,
                 deletedAt: null
             },
             data: {
-                password: data.newPassword
+                deletedAt: new Date()
             }
         });
 
-        return editAdminPassword;
+        return softDeleteMentor;
 
     }
 
-    // DELETE ADMIN METHOD
-    async delete(id: number) {
-        const softDeleteAdmin = await prisma.admin.update({
-            where: {
-                id: id,
-                deletedAt: null,
-            },
-            data: {
-                deletedAt: new Date(),
-                account: {
-                    updateMany: {
-                        where: {
-                            adminId: id,
-                            deletedAt: null
-                        },
-                        data: {
-                            deletedAt: new Date()
-                        }
-                    }
-                }
-            },
-        });
-
-        return softDeleteAdmin;
-    }
-
-    // LIST w/ SEARCH AND PAGINATION METHOD
+    // MENTOR LIST w/ SEARCH AND PAGINATION METHOD
     async list(query: string, skip: number, limit: number) {
 
-        const admins = await prisma.admin.findMany({
+        const mentors = await prisma.mentor.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -193,7 +140,7 @@ class AdminRepo {
             }
         });
 
-        const totalAdmins = await prisma.admin.count({
+        const totalMentors = await prisma.mentor.count({
             where: {
                 deletedAt: null,
                 OR: [
@@ -226,8 +173,8 @@ class AdminRepo {
         });
 
         return {
-            admins,
-            totalAdmins
+            mentors,
+            totalMentors
         }
 
     }
@@ -235,7 +182,7 @@ class AdminRepo {
     // ARCHIVE METHOD
     async archive(id: number) {
 
-        const restoreAdmin = await prisma.admin.update({
+        const restoreMentor = await prisma.mentor.update({
             where: {
                 id: id,
                 deletedAt: {
@@ -244,30 +191,17 @@ class AdminRepo {
             },
             data: {
                 deletedAt: null,
-                account: {
-                    updateMany: {
-                        where: {
-                            adminId: id,
-                            deletedAt: {
-                                not: null
-                            }
-                        },
-                        data: {
-                            deletedAt: null
-                        }
-                    }
-                }
             }
         });
 
-        return restoreAdmin;
+        return restoreMentor;
 
     }
 
-    // ARCHIVE LIST w/ SEARCH AND PAGINATION METHOD
+    // MENTOR ARCHIVE LIST METHOD
     async archiveList(query: string, skip: number, limit: number) {
 
-        const deletedAdmins = await prisma.admin.findMany({
+        const deletedMentors = await prisma.mentor.findMany({
             skip: skip,
             take: limit,
             where: {
@@ -299,7 +233,6 @@ class AdminRepo {
                             mode: "insensitive"
                         }
                     }
-
                 ]
             },
             orderBy: {
@@ -307,7 +240,7 @@ class AdminRepo {
             }
         });
 
-        const totalDeletedAdmins = await prisma.admin.count({
+        const totalDeletedMentors = await prisma.mentor.count({
             where: {
                 deletedAt: {
                     not: null
@@ -342,12 +275,12 @@ class AdminRepo {
         });
 
         return {
-            deletedAdmins,
-            totalDeletedAdmins
+            deletedMentors,
+            totalDeletedMentors
         }
 
     }
 
 }
 
-export default AdminRepo;
+export default MentorRepository;

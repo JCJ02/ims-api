@@ -12,4 +12,3 @@ routes.use("/mentor", mentorRoute);
 routes.use("/intern", internRoute);
 
 export default routes;
-

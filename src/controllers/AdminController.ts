@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import AppResponse from "../utils/AppResponse";
+import AppResponse from "../utils/appResponse";
 import AdminService from "../services/AdminService";
-import { adminSchema, authAdminSchema, updateAdminSchema, updateAdminPasswordSchema } from "../utils/validations/AdminSchema";
-import { sendingEmailSchema } from "../utils/validations/EmailSchema";
-import { authMiddlewareRequest } from "../types/AuthMiddlewareType";
+import { createAdminSchema, authenticateAdminSchema, updateAdminSchema, updateAdminPasswordSchema } from "../utils/zod/AdminSchema";
+import { sendingEmailSchema } from "../utils/zod/EmailSchema";
+import { authenticationMiddlewareRequest } from "../types/AuthenticationMiddlewareType";
 import TestService from "../services/TestService";
 
 class AdminController {
@@ -17,7 +17,7 @@ class AdminController {
         this.testService = new TestService();
 
         this.test = this.test.bind(this);
-        this.dashboard = this.dashboard.bind(this);
+        this.index = this.index.bind(this);
         this.create = this.create.bind(this);
         this.authenticate = this.authenticate.bind(this);
         this.update = this.update.bind(this);
@@ -63,7 +63,7 @@ class AdminController {
         }
     }
 
-    async dashboard(req: authMiddlewareRequest, res: Response) {
+    async index(req: authenticationMiddlewareRequest, res: Response) {
 
         try {
 
@@ -109,7 +109,7 @@ class AdminController {
 
         try {
 
-            const validateAdminData = adminSchema.safeParse(req.body);
+            const validateAdminData = createAdminSchema.safeParse(req.body);
 
             if (validateAdminData.error) {
                 return AppResponse.sendErrors({
@@ -156,7 +156,7 @@ class AdminController {
 
         try {
             //console.log("Raw request body: ", req.body);
-            const validation = authAdminSchema.safeParse(req.body);
+            const validation = authenticateAdminSchema.safeParse(req.body);
 
             if (validation.error) {
                 return AppResponse.sendErrors({
@@ -455,10 +455,10 @@ class AdminController {
     async archive(req: Request, res: Response) {
 
         try {
-            
+
             const adminId = Number(req.params.id);
 
-            if(!adminId) {
+            if (!adminId) {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
@@ -468,7 +468,7 @@ class AdminController {
             } else {
                 const isAdminRestored = await this.adminService.archive(adminId);
 
-                if(!isAdminRestored) {
+                if (!isAdminRestored) {
                     return AppResponse.sendErrors({
                         res,
                         data: null,
@@ -500,7 +500,7 @@ class AdminController {
     async archiveList(req: Request, res: Response) {
 
         try {
-            
+
             const searchResults = await this.adminService.archiveList(req);
             // console.log(`Searched: ${searchResults}`);
             return AppResponse.sendSuccessful({
@@ -511,7 +511,7 @@ class AdminController {
             });
 
         } catch (error: any) {
-            
+
             return AppResponse.sendErrors({
                 res,
                 data: null,
