@@ -2,7 +2,7 @@
 import AdminRepository from "../repositories/AdminRepository";
 import { adminAccountType, adminType } from "../types/AdminType";
 import { sendInternAccountDetails } from "../utils/sendInternAccountDetails";
-import { generateToken } from "../utils/token";
+import { generateRefreshToken, generateToken } from "../utils/token";
 import bcrypt from "bcryptjs";
 import { Request } from "express";
 
@@ -55,10 +55,32 @@ class AdminService {
 
         const token = generateToken({
             id: admin.id,
+            firstname: admin.firstname,
+            lastname: admin.lastname,
+            email: admin.email,
+            role: admin.role
+        });
+
+        const refreshToken = generateRefreshToken({
+            id: admin.id,
+            firstname: admin.firstname,
+            lastname: admin.lastname,
+            email: admin.email,
             role: admin.role
         });
         // console.log("Token: ", token);
-        return token;
+
+        return {
+            accessToken: token,
+            refreshToken: refreshToken,
+            admin: {
+                id: admin.id,
+                firstname: admin.firstname,
+                lastname: admin.lastname,
+                email: admin.email,
+                role: admin.role
+            }
+        };
 
     }
 
