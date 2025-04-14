@@ -1,7 +1,7 @@
 
 import AdminRepository from "../repositories/AdminRepository";
 import { adminAccountType, adminType } from "../types/AdminType";
-import { sendEmails } from "../utils/sendInternAccountDetails";
+import { sendInternAccountDetails } from "../utils/sendInternAccountDetails";
 import { generateToken } from "../utils/token";
 import bcrypt from "bcryptjs";
 import { Request } from "express";
@@ -167,7 +167,7 @@ class AdminService {
             message: data.message
         };
 
-        return await sendEmails(options);
+        return await sendInternAccountDetails(options);
 
     }
 
