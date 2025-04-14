@@ -5,6 +5,7 @@ import { createAdminSchema, authenticateAdminSchema, updateAdminSchema, updateAd
 import { sendingEmailSchema } from "../utils/zod/EmailSchema";
 import { authenticationMiddlewareRequest } from "../types/AuthenticationMiddlewareType";
 import TestService from "../services/TestService";
+import { generateToken, verifyRefreshToken } from "../utils/token";
 
 class AdminController {
 
@@ -17,7 +18,8 @@ class AdminController {
         this.testService = new TestService();
 
         this.test = this.test.bind(this);
-        this.index = this.index.bind(this);
+        this.accessToken = this.accessToken.bind(this);
+        this.refreshToken = this.refreshToken.bind(this);
         this.create = this.create.bind(this);
         this.authenticate = this.authenticate.bind(this);
         this.update = this.update.bind(this);
@@ -63,7 +65,8 @@ class AdminController {
         }
     }
 
-    async index(req: authenticationMiddlewareRequest, res: Response) {
+    // VERIFY ACCESS TOKEN FUNCTION
+    async accessToken(req: authenticationMiddlewareRequest, res: Response) {
 
         try {
 
@@ -102,6 +105,75 @@ class AdminController {
 
         }
 
+    }
+
+    // CREATE REFRESH TOKEN FUNCTION
+    async refreshToken(req: Request, res: Response) {
+        try {
+            // 1. EXTRACT REFRESH TOKEN
+            const authorizationHeader = req.headers.authorization;
+
+            if (!authorizationHeader?.startsWith('Bearer ')) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Authorization Header with Bearer Token Required",
+                    code: 401
+                });
+            }
+
+            const refreshToken = authorizationHeader.split(' ')[1].trim();
+
+            // 2. VERIFY REFRESH TOKEN
+            const decoded = verifyRefreshToken(refreshToken);
+
+            // 3. FETCH ADMIN FROM DATABASE USING ID FROM REFRESH TOKEN
+            const adminService = new AdminService();
+            const admin = await adminService.show(decoded.id);
+
+            if (!admin) {
+                return AppResponse.sendErrors({
+                    res,
+                    data: null,
+                    message: "Admin not Found",
+                    code: 404
+                });
+            }
+
+            // 4. GENERATE NEW ACCESS TOKEN
+            const newAccessToken = generateToken({
+                id: admin.id,
+                firstname: admin.firstname,
+                lastname: admin.lastname,
+                email: admin.email,
+                role: admin.role
+            });
+
+            // 5. RETURN SUCCESS RESPONSE
+            return AppResponse.sendSuccessful({
+                res,
+                data: { accessToken: newAccessToken },
+                message: "Access Token Refreshed",
+                code: 200
+            });
+
+        } catch (error: any) {
+            // HANDLE SPECIFIC JWT ERRORS
+            const message = error.message === "Invalid Token" ? "Invalid Refresh Token"
+                : error.message === "Token Expired" ? "Refresh Token Expired"
+                    : "Token Refresh Failed";
+
+            const code = error.message === "Invalid Token" ? 401
+                : error.message === "Token Expired" ? 401
+                    : 500;
+
+            return AppResponse.sendErrors({
+                res,
+                data: null,
+                message,
+                code
+            });
+        }
     }
 
     // CREATE ADMIN METHOD
@@ -173,14 +245,14 @@ class AdminController {
                 return AppResponse.sendErrors({
                     res,
                     data: null,
-                    message: "Invalid Log In Credentials!",
+                    message: "Invalid Credentials!",
                     code: 401
                 });
             } else {
                 return AppResponse.sendSuccessful({
                     res,
                     data: result,
-                    message: "Log In Successful!",
+                    message: "Login Successful!",
                     code: 200
                 });
             }
