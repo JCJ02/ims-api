@@ -6,7 +6,8 @@ const adminRoute = express.Router();
 const adminController = new AdminController();
 
 adminRoute.get("/test", adminController.test);
-adminRoute.get("/index", authenticationMiddleware, adminController.index);
+adminRoute.get("/access-token", authenticationMiddleware, adminController.accessToken);
+adminRoute.get("/refresh-token", adminController.refreshToken);
 adminRoute.post("/", adminController.create);
 adminRoute.post("/authenticate", adminController.authenticate);
 adminRoute.put("/:id", authenticationMiddleware, adminController.update);
