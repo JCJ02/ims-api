@@ -7,7 +7,7 @@ const adminController = new AdminController();
 
 adminRoute.get("/test", adminController.test);
 adminRoute.get("/index", authenticationMiddleware, adminController.index);
-adminRoute.post("/", authenticationMiddleware, adminController.create);
+adminRoute.post("/", adminController.create);
 adminRoute.post("/authenticate", adminController.authenticate);
 adminRoute.put("/:id", authenticationMiddleware, adminController.update);
 adminRoute.put("/update-password/:id", authenticationMiddleware, adminController.updatePassword);
