@@ -1,6 +1,6 @@
 import { Response } from "express";
 
-type appResponseParams = {
+type AppResponseParams = {
     res: Response,
     message?: string,
     data: unknown,
@@ -8,20 +8,33 @@ type appResponseParams = {
 }
 
 class AppResponse {
-    static sendSuccessfull({res, message, data, code}: appResponseParams): void {
+    static sendSuccessful({ res, message, data, code }: AppResponseParams): void {
         res.status(code).json({
-            message,
             data,
+            message,
             code
-        })
+        });
     }
 
-    static sendErrors({res, message, data, code}: appResponseParams): void {
+    static sendErrors({ res, message, data, code }: AppResponseParams): void {
+
+        let returnMessage;
+
+        if (code !== 500) {
+            returnMessage = message;
+        } else {
+            if (process.env.ENV == "development") {
+                returnMessage = message;
+            } else {
+                returnMessage = "Internal Server Error!";
+            }
+        }
+
         res.status(code).json({
-            message,
             data,
+            message: returnMessage,
             code
-        })
+        });
     }
 }
 
