@@ -67,11 +67,9 @@ model Account {
 
 model Role {
   id              Int       @id @default(autoincrement())
-  firstname       String
-  lastname        String
-  email           String
-  password        String
-  confirmPassword String?
+  roleId          String
+  roleName        String
+  roleDescription String
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
@@ -100,13 +98,19 @@ model Completion_Status {
   daysLeft        Int         @default(0)
   overtime        Int?        @default(0)
   endOfInternship DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
   Attendance      Attendance? @relation(fields: [attendanceId], references: [id])
 }
 
 model Tasks {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   internId    Int?
   title       String
   description String
-  Intern      Intern? @relation(fields: [internId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  Intern      Intern?   @relation(fields: [internId], references: [id])
 }
