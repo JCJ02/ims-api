@@ -6,6 +6,7 @@ import { sendingEmailSchema } from "../utils/zod/EmailSchema";
 import { authenticationMiddlewareRequest } from "../types/AuthenticationMiddlewareType";
 import TestService from "../services/TestService";
 
+
 class AdminController {
 
     private adminService;
