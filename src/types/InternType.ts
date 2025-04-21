@@ -14,20 +14,20 @@ export interface authInternRequest extends Request {
 }
 
 export type baseInternType = {
-    firstname: string;
-    lastname: string;
-    email: string;
-    birthdate: Date;
-    school: string;
-    mentor: string;
-    role: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  birthdate: Date;
+  school: string;
+  mentor: string;
+  role: string;
 };
 
 export type internAccountType = baseInternType & {
-    id?: number
-    password: string
+  id?: number
+  password: string
 };
 
 export type internType = baseInternType & {
-    id?: number
+  id?: number
 };
